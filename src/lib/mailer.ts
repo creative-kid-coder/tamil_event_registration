@@ -59,7 +59,7 @@ export async function composeTicketEmail(reg: Registration, options: { to?: stri
       .join('')}
     <tr><td style="padding:6px 8px;font-weight:bold">Total people</td><td style="padding:6px 8px;text-align:right;font-weight:bold">${reg.totalPeople}</td></tr>
   </table>
-  <p style="background:#fef3c7;padding:10px;border-radius:6px">If anything above is wrong, please reply to this email before the event so we can fix it.</p>
+  <p style="background:#fef3c7;padding:10px;border-radius:6px">If any of the above information is incorrect, please reply to this email before the event so we can fix it.</p>
   ${url ? `<p style="font-size:12px;color:#64748b">Can't see the QR code? Open <a href="${url}">${url}</a> on your phone.</p>` : ''}
 </div>`;
 
@@ -76,7 +76,7 @@ export async function composeTicketEmail(reg: Registration, options: { to?: stri
     ...lines.map((b) => `  ${b.label}: ${reg.badges[b.key]}`),
     `  Total people: ${reg.totalPeople}`,
     '',
-    'If anything above is wrong, please reply to this email before the event.',
+    'If any of the above information is incorrect, please reply to this email before the event.',
   ].join('\n');
 
   const replyTo = process.env.EMAIL_REPLY_TO?.trim();
