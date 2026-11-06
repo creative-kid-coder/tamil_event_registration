@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const data = getData();
+    const data = await getData();
     const ok = data.mapping.missing.length === 0;
     return NextResponse.json(
       { ok, rows: data.registrations.length, missingColumns: data.mapping.missing },

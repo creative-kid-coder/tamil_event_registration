@@ -13,7 +13,7 @@ export default async function TicketPage({ params }: { params: Promise<{ ticketI
   let reg: Registration | undefined;
   let loadError = false;
   try {
-    reg = findByTicket(getData(), ticketId);
+    reg = findByTicket(await getData(), ticketId);
   } catch (error) {
     console.error(error);
     loadError = true;

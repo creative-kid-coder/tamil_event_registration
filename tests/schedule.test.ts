@@ -2,7 +2,9 @@ import { mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { setBlobClient } from '@/lib/blob';
 import { groupSchedule, nowAndNext, parseSchedule, statusTimes, type ScheduledItem, type ScheduleStatus } from '@/lib/schedule';
+import { memoryBlob } from './memoryBlob';
 
 const items = (list: object[]) => JSON.stringify({ items: list });
 
@@ -141,11 +143,16 @@ describe('nowAndNext', () => {
   });
 });
 
-describe('schedule store (file + SQLite)', () => {
+describe('schedule store', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'schedule-test-'));
   const file = path.join(dir, 'schedule.json');
   let store: typeof import('@/lib/scheduleStore');
   let bump = 0;
+  const RUNNING_ORDER = items([
+    { id: 'doors', title: 'Doors', start: '16:30' },
+    { id: 'welcome', title: 'Welcome', start: '17:15' },
+    { id: 'dinner', title: 'Dinner', start: '19:00' },
+  ]);
 
   /** Writes the file with a new mtime, so the store notices the change. */
   function writeSchedule(text: string) {
@@ -153,80 +160,99 @@ describe('schedule store (file + SQLite)', () => {
     const t = new Date(Date.now() + ++bump * 1000);
     utimesSync(file, t, t);
   }
-  const get = (id: string) => store.getScheduleWithStatus().items.find((i) => i.id === id)!;
+  const get = async (id: string) => (await store.getScheduleWithStatus()).items.find((i) => i.id === id)!;
 
   beforeAll(async () => {
     process.env.DB_PATH = path.join(dir, 'checkin.db');
     process.env.SCHEDULE_JSON = file;
-    writeSchedule(
-      items([
-        { id: 'doors', title: 'Doors', start: '16:30' },
-        { id: 'welcome', title: 'Welcome', start: '17:15' },
-        { id: 'dinner', title: 'Dinner', start: '19:00' },
-      ]),
-    );
+    writeSchedule(RUNNING_ORDER);
     store = await import('@/lib/scheduleStore');
   });
 
   afterAll(() => {
+    delete process.env.STORAGE;
+    setBlobClient(null);
     try {
       rmSync(dir, { recursive: true, force: true });
     } catch {} // Windows may keep the WAL files locked until the process exits
   });
 
-  it('starts every item as upcoming', () => {
-    expect(store.getScheduleWithStatus().items.map((i) => i.status)).toEqual(['upcoming', 'upcoming', 'upcoming']);
+  // The same behaviour on the laptop (SQLite) and on Vercel (Blob).
+  describe.each([
+    ['laptop (SQLite)', () => delete process.env.STORAGE],
+    [
+      'Vercel (Blob)',
+      () => {
+        process.env.STORAGE = 'blob';
+        setBlobClient(memoryBlob());
+      },
+    ],
+  ])('statuses on the %s', (_name, useBackend) => {
+    beforeAll(() => {
+      useBackend();
+      writeSchedule(RUNNING_ORDER);
+    });
+
+    it('starts every item as upcoming', async () => {
+      expect((await store.getScheduleWithStatus()).items.map((i) => i.status)).toEqual(['upcoming', 'upcoming', 'upcoming']);
+    });
+
+    it('records when an item actually started and finished', async () => {
+      await store.setStatus('doors', 'starting', 'Admin');
+      const started = (await get('doors')).startedAt;
+      expect(started).toBeTruthy();
+
+      await store.setStatus('doors', 'live', 'Admin');
+      expect(await get('doors')).toMatchObject({ status: 'live', startedAt: started, completedAt: null });
+
+      await store.setStatus('doors', 'done', 'Admin');
+      const finished = (await get('doors')).completedAt;
+      expect(finished).toBeTruthy();
+      await store.setStatus('doors', 'done', 'Admin');
+      expect(await get('doors')).toMatchObject({ startedAt: started, completedAt: finished });
+    });
+
+    it('going back to upcoming clears the times', async () => {
+      await store.setStatus('doors', 'upcoming', 'Admin');
+      expect(await get('doors')).toMatchObject({ status: 'upcoming', startedAt: null, completedAt: null });
+    });
+
+    it('keeps a note through status changes, and clears it when emptied', async () => {
+      await store.setNote('welcome', '  Moved   to Hall B ', 'Admin');
+      await store.setStatus('welcome', 'live', 'Admin');
+      expect(await get('welcome')).toMatchObject({ status: 'live', note: 'Moved to Hall B' });
+      await store.setNote('welcome', '   ', 'Admin');
+      expect((await get('welcome')).note).toBeNull();
+    });
+
+    it('completes an item and starts the next upcoming one', async () => {
+      expect(await store.completeAndStartNext('welcome', 'Admin')).toBe('dinner');
+      expect((await get('welcome')).status).toBe('done');
+      expect(await get('dinner')).toMatchObject({ status: 'starting' });
+      expect((await get('dinner')).startedAt).toBeTruthy();
+    });
+
+    it('on the last item, just completes it', async () => {
+      expect(await store.completeAndStartNext('dinner', 'Admin')).toBeNull();
+      expect((await get('dinner')).status).toBe('done');
+    });
+
+    it('two organisers changing different items at once both stick', async () => {
+      await Promise.all([store.setStatus('doors', 'live', 'Organiser 1'), store.setNote('dinner', 'Running late', 'Organiser 2')]);
+      expect(await get('doors')).toMatchObject({ status: 'live' });
+      expect(await get('dinner')).toMatchObject({ status: 'done', note: 'Running late' });
+    });
   });
 
-  it('records when an item actually started and finished', () => {
-    store.setStatus('doors', 'starting', 'Admin');
-    const started = get('doors').startedAt;
-    expect(started).toBeTruthy();
-
-    store.setStatus('doors', 'live', 'Admin');
-    expect(get('doors')).toMatchObject({ status: 'live', startedAt: started, completedAt: null });
-
-    store.setStatus('doors', 'done', 'Admin');
-    const finished = get('doors').completedAt;
-    expect(finished).toBeTruthy();
-    store.setStatus('doors', 'done', 'Admin');
-    expect(get('doors')).toMatchObject({ startedAt: started, completedAt: finished });
-  });
-
-  it('going back to upcoming clears the times', () => {
-    store.setStatus('doors', 'upcoming', 'Admin');
-    expect(get('doors')).toMatchObject({ status: 'upcoming', startedAt: null, completedAt: null });
-  });
-
-  it('keeps a note through status changes, and clears it when emptied', () => {
-    store.setNote('welcome', '  Moved   to Hall B ', 'Admin');
-    store.setStatus('welcome', 'live', 'Admin');
-    expect(get('welcome')).toMatchObject({ status: 'live', note: 'Moved to Hall B' });
-    store.setNote('welcome', '   ', 'Admin');
-    expect(get('welcome').note).toBeNull();
-  });
-
-  it('completes an item and starts the next upcoming one', () => {
-    expect(store.completeAndStartNext('welcome', 'Admin')).toBe('dinner');
-    expect(get('welcome').status).toBe('done');
-    expect(get('dinner')).toMatchObject({ status: 'starting' });
-    expect(get('dinner').startedAt).toBeTruthy();
-  });
-
-  it('on the last item, just completes it', () => {
-    expect(store.completeAndStartNext('dinner', 'Admin')).toBeNull();
-    expect(get('dinner').status).toBe('done');
-  });
-
-  it('picks up edits to the file, and keeps the last good version if an edit is broken', () => {
+  it('picks up edits to the file, and keeps the last good version if an edit is broken', async () => {
     writeSchedule(items([{ id: 'doors', title: 'Doors open', start: '16:00' }, { id: 'dinner', title: 'Dinner', start: '19:00' }]));
-    let result = store.getScheduleWithStatus();
+    let result = await store.getScheduleWithStatus();
     expect(result.error).toBeNull();
     expect(result.items.map((i) => i.title)).toEqual(['Doors open', 'Dinner']);
     expect(result.items[1].status).toBe('done'); // status follows the id
 
     writeSchedule('{ "items": [ { "id": "oops" ');
-    result = store.getScheduleWithStatus();
+    result = await store.getScheduleWithStatus();
     expect(result.error).toMatch(/not valid JSON/);
     expect(result.items.map((i) => i.title)).toEqual(['Doors open', 'Dinner']);
   });

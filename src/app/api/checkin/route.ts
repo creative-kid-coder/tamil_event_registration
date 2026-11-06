@@ -12,10 +12,10 @@ export async function POST(req: NextRequest) {
     const session = await sessionFrom(req);
     if (!session) return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
     const { ticketId } = await readJson<{ ticketId: string }>(req);
-    const reg = findByTicket(getData(), String(ticketId ?? ''));
+    const reg = findByTicket(await getData(), String(ticketId ?? ''));
     if (!reg) return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
 
-    const result = checkIn(reg.ticketId, session.name, reg.badges);
+    const result = await checkIn(reg.ticketId, session.name, reg.badges);
     return NextResponse.json(
       { status: result.created ? 'ok' : 'already', party: { ...reg, checkIn: result.checkIn } },
       { status: result.created ? 200 : 409 },
@@ -31,10 +31,10 @@ export async function DELETE(req: NextRequest) {
     const session = await sessionFrom(req);
     if (!session) return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
     const { ticketId } = await readJson<{ ticketId: string }>(req);
-    const reg = findByTicket(getData(), String(ticketId ?? ''));
+    const reg = findByTicket(await getData(), String(ticketId ?? ''));
     if (!reg) return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
 
-    undoCheckIn(reg.ticketId, session.name);
+    await undoCheckIn(reg.ticketId, session.name);
     return NextResponse.json({ status: 'ok', party: { ...reg, checkIn: null } });
   } catch (error) {
     return errorResponse(error);

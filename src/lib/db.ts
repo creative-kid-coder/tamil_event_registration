@@ -1,14 +1,11 @@
 /**
  * The app's local SQLite file (data/checkin.db) using Node's built-in SQLite —
- * no external database. Needs a persistent disk and a single app process,
- * i.e. the venue laptop; it cannot work on Vercel.
+ * no external database. Used on the venue laptop; on Vercel (no persistent
+ * disk) check-ins and programme statuses go to Vercel Blob instead (blob.ts).
  */
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import type { DatabaseSync as Database } from 'node:sqlite';
-
-// process.getBuiltinModule keeps the bundler away from node:sqlite.
-const { DatabaseSync } = process.getBuiltinModule('node:sqlite') as typeof import('node:sqlite');
 
 export const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), 'data', 'checkin.db');
 
@@ -16,7 +13,8 @@ let db: Database | null = null;
 
 export function getDb(): Database {
   if (db) return db;
-  if (process.env.VERCEL) throw new Error('Check-ins need a persistent disk — run the app on the venue laptop, not Vercel');
+  // Loaded here rather than at import, so Vercel never loads it. process.getBuiltinModule keeps the bundler away.
+  const { DatabaseSync } = process.getBuiltinModule('node:sqlite') as typeof import('node:sqlite');
   mkdirSync(path.dirname(DB_PATH), { recursive: true });
   const conn = new DatabaseSync(DB_PATH);
   conn.exec(`

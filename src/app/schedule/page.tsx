@@ -15,7 +15,7 @@ export default async function SchedulePage() {
   let items: ScheduledItem[] = [];
   let loadError = false;
   try {
-    items = getScheduleWithStatus().items;
+    items = (await getScheduleWithStatus()).items;
   } catch (error) {
     console.error(error);
     loadError = true;

@@ -25,7 +25,7 @@ export async function GET() {
       ...BADGES.map((b) => b.label),
       'Total People', 'Volunteering', 'Cultural Program', 'Checked In At', 'Checked In By', 'Warnings',
     ];
-    const rows = getParties()
+    const rows = (await getParties())
       .sort((a, b) => a.surname.localeCompare(b.surname) || a.firstName.localeCompare(b.firstName))
       .map((r) => [
         r.ticketId, r.firstName, r.surname, r.mobile, r.email, r.adult1MealRaw,

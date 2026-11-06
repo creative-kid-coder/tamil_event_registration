@@ -7,11 +7,11 @@ Check-in for an event whose registrations came from a Google Form. Volunteers sc
 - **Guest page** (`/t/<ticket>`): first name and booking counts only.
 
 How it works:
-- **Registrations** come from `data/responses.csv`, your form export.
-- **Check-ins** are stored in `data/checkin.db`, a SQLite file built into Node.js. There's no external database or service.
+- **Registrations** come from your form export: `data/responses.csv`, or a CSV uploaded on the Admin page.
 - **Sign-in** is with a shared PIN: a desk PIN for volunteers and an admin PIN for organisers.
-- **Hosting:** the app runs on **a laptop at the venue**. Phones reach it through a Cloudflare quick tunnel, which only forwards traffic and stores nothing.
-  - This can't run on Vercel: Vercel's storage is temporary and isn't shared between copies of the app, so check-ins would be lost.
+- **Hosting** works two ways:
+  - **On a laptop at the venue.** Check-ins are stored in `data/checkin.db`, a SQLite file built into Node.js, with no external service. Phones reach the laptop through a Cloudflare quick tunnel, which only forwards traffic and stores nothing.
+  - **On Vercel.** Vercel has no lasting disk, so the responses, check-ins and programme statuses are kept as private files in a **Vercel Blob** store. See [Run it on Vercel instead](#run-it-on-vercel-instead).
 
 ---
 
@@ -39,9 +39,13 @@ The desk card and **Admin → Data issues** flag:
 
 ## 1. Add the responses
 
-In the Google Sheet: **File → Download → Comma-separated values (.csv)**. Save it as **`data/responses.csv`**.
+In the Google Sheet: **File → Download → Comma-separated values (.csv)**. Save it as **`data/responses.csv`**, or upload it on **Admin → Responses → Upload responses CSV**.
 
-To update later (late registrations, corrections): download again and replace the file. The app picks up the new file on the next page load, with no restart. Check-ins are kept, because they're matched by ticket ID.
+- **Where the app reads it from:** `data/responses.csv` when that file exists, otherwise the copy uploaded to Vercel Blob.
+- **Where an upload is saved:** on the laptop, to `data/responses.csv` (the old file is kept as `responses.previous.csv`); on Vercel, privately to Blob.
+- **Checks:** an upload must have the form's columns and at least one response. Otherwise it's rejected and the old file stays in use.
+
+To update later (late registrations, corrections): download again and replace or re-upload the file. The app picks up the new file on the next page load, with no restart. Check-ins are kept, because they're matched by ticket ID.
 
 **Ticket IDs and QR codes**
 - Each guest's ticket ID comes from their response's **timestamp + email**, combined with `TICKET_SECRET`. The same row always produces the same QR code, with nothing stored.
@@ -90,6 +94,27 @@ Open that `https://…trycloudflare.com` address on every desk phone. It must be
 Keep the laptop **plugged in**, with **sleep turned off**, and on reliable internet. A phone hotspot is a good backup to the venue Wi-Fi. If the laptop or its connection drops, desks show an error until it's back; check-ins already saved are safe in `data/checkin.db`.
 
 > Leave `PUBLIC_BASE_URL` empty when using the quick tunnel. QR codes then contain just the ticket ID, which the scanner reads the same way, and emails carry no link that could go dead.
+
+## Run it on Vercel instead
+
+Vercel gives the app a fixed https address and needs no laptop. Because Vercel has no lasting disk, the app keeps its data in **Vercel Blob** there:
+- the **responses CSV** you upload on the Admin page;
+- **check-ins**, kept so two desks still can't check in the same party twice;
+- **programme statuses**.
+
+All of these are **private** files: none has a public link.
+
+1. **Connect a Blob store:** in the Vercel project, open **Storage → Blob**, create or choose a store and connect it with the prefix **`TAMIL_EVENT`**. Vercel adds `TAMIL_EVENT_STORE_ID` and `TAMIL_EVENT_READ_WRITE_TOKEN` itself. If you use another prefix, also set `BLOB_ENV_PREFIX` to it.
+2. **Add the other settings** from `.env.local` under **Settings → Environment Variables**: `DESK_PIN`, `ADMIN_PIN`, `SESSION_SECRET`, `TICKET_SECRET`, `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `EMAIL_REPLY_TO`, `EVENT_NAME`, `EVENT_DATE` and `EVENT_VENUE`.
+   - `TICKET_SECRET` **must be the same value as on the laptop**, or the QR codes you've already emailed won't scan.
+   - Set `PUBLIC_BASE_URL` to the Vercel address if you'd like QR emails to link to the guest's ticket page.
+3. **Redeploy**, sign in with the admin PIN and **upload the responses CSV** on the Admin page.
+
+The programme's running order comes from `data/schedule.json` in the repository, so edits to it need a redeploy on Vercel.
+
+**Use one place on the day.** The laptop and Vercel keep separate check-ins. Pick one for every desk, and don't switch part-way through.
+
+**Usage:** open desk and guest pages check for updates every 10–15 seconds. The server reuses each Blob read for a few seconds (3 for check-ins, 5 for the programme), so many phones don't each cost a read. Check-ins and programme changes always read fresh. Keep an eye on **Usage** in the Vercel dashboard on the day, especially with many guests following the programme.
 
 ## 5. Send the QR emails (Gmail)
 

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 /** Public: the programme with live statuses. Contains no personal data. */
 export async function GET(req: NextRequest) {
   try {
-    const { items, error } = getScheduleWithStatus();
+    const { items, error } = await getScheduleWithStatus();
     const session = await sessionFrom(req);
     const canManage = session?.role === 'admin';
     return NextResponse.json({

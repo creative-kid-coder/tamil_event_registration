@@ -52,13 +52,13 @@ export default function DeskPage() {
 
   const load = useCallback(async () => {
     const { ok, data } = await apiCall<ListResponse>('/api/registrations');
+    if (data.session !== undefined) setSession(data.session ?? null);
+    if (data.event?.name) setEventName(data.event.name);
     if (!ok || !data.parties) {
       setLoadError(data.error ?? 'Could not load registrations');
       return null;
     }
     setParties(data.parties);
-    setSession(data.session ?? null);
-    setEventName(data.event?.name ?? '');
     setLoadError('');
     setLoaded(true);
     return data.parties;

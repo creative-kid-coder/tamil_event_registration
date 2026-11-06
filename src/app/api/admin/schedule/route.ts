@@ -27,18 +27,18 @@ export async function POST(req: NextRequest) {
 
     let startedNext: string | null = null;
     if (body.action === 'next') {
-      startedNext = completeAndStartNext(itemId, session.name);
+      startedNext = await completeAndStartNext(itemId, session.name);
     } else if (body.status !== undefined || body.note !== undefined) {
       if (body.status !== undefined) {
         if (!isStatus(body.status)) return NextResponse.json({ error: `Unknown status "${body.status}"` }, { status: 400 });
-        setStatus(itemId, body.status, session.name);
+        await setStatus(itemId, body.status, session.name);
       }
-      if (body.note !== undefined) setNote(itemId, String(body.note), session.name);
+      if (body.note !== undefined) await setNote(itemId, String(body.note), session.name);
     } else {
       return NextResponse.json({ error: 'Nothing to change' }, { status: 400 });
     }
 
-    const { items, error } = getScheduleWithStatus();
+    const { items, error } = await getScheduleWithStatus();
     return NextResponse.json({ items, error, startedNext, updatedAt: new Date().toISOString() });
   } catch (error) {
     return errorResponse(error);

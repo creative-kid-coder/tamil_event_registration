@@ -235,6 +235,19 @@ export const CopyIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const UploadIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 16V4M7 9l5-5 5 5M4 20h16" />
+  </Icon>
+);
+
+export const FileIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+    <path d="M14 3v5h5M9 13h6M9 17h4" />
+  </Icon>
+);
+
 export const ExternalIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />

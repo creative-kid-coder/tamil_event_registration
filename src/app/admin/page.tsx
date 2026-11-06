@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { Avatar } from '@/components/Avatar';
+import { ResponsesCard } from '@/components/ResponsesCard';
 import { AlertIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronRightIcon, ClockIcon, DownloadIcon, MailIcon, PauseIcon, SearchIcon, SendIcon, TicketIcon, UsersIcon, XIcon } from '@/components/icons';
 import { StatsTiles } from '@/components/StatsTiles';
 import { BADGES } from '@/config/badges';
@@ -95,21 +96,22 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const stopRef = useRef(false);
 
+  const load = useCallback(async () => {
+    const { ok, data } = await apiCall<ListResponse>('/api/registrations');
+    if (data.session !== undefined) setSession(data.session ?? null);
+    if (data.event?.name) setEventName(data.event.name);
+    if (!ok || !data.parties) {
+      setError(data.error ?? 'Could not load registrations');
+      return;
+    }
+    setRegs(data.parties);
+    setMissing(data.missing ?? []);
+    setError('');
+    const schedule = await apiCall<{ items: ScheduledItem[] }>('/api/schedule');
+    if (schedule.ok && schedule.data.items) setProgramme(schedule.data.items);
+  }, []);
+
   useEffect(() => {
-    const load = async () => {
-      const { ok, data } = await apiCall<ListResponse>('/api/registrations');
-      if (!ok || !data.parties) {
-        setError(data.error ?? 'Could not load registrations');
-        return;
-      }
-      setRegs(data.parties);
-      setSession(data.session ?? null);
-      setEventName(data.event?.name ?? '');
-      setMissing(data.missing ?? []);
-      setError('');
-      const schedule = await apiCall<{ items: ScheduledItem[] }>('/api/schedule');
-      if (schedule.ok && schedule.data.items) setProgramme(schedule.data.items);
-    };
     load();
     const timer = setInterval(load, 15_000);
     (async () => {
@@ -120,7 +122,7 @@ export default function AdminPage() {
       }
     })();
     return () => clearInterval(timer);
-  }, []);
+  }, [load]);
 
   const stats = useMemo(() => {
     const checked = regs.filter((r) => r.checkIn);
@@ -346,6 +348,8 @@ export default function AdminPage() {
 
           {/* Right column */}
           <div className="space-y-5 lg:col-span-2">
+            <ResponsesCard onUploaded={load} />
+
             <Section
               title="QR emails"
               icon={<MailIcon className="h-4 w-4" />}

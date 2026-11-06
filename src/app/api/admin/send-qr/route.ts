@@ -15,7 +15,7 @@ const PAUSE_MS = 1000;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Every registration with an email, in CSV order. Sending walks this list by position. */
-const recipients = () => getData().registrations.filter((r) => r.email);
+const recipients = async () => (await getData()).registrations.filter((r) => r.email);
 
 /** Whether email sending is configured, and from which address. */
 export async function GET() {
@@ -24,11 +24,13 @@ export async function GET() {
     try {
       from = emailFrom();
     } catch {}
+    // No responses loaded yet is fine here: there's just nobody to email.
+    const total = await recipients().then((list) => list.length, () => 0);
     return NextResponse.json({
       configured: Boolean(from),
       from,
       testTo: process.env.EMAIL_REPLY_TO || from || '',
-      total: recipients().length,
+      total,
     });
   } catch (error) {
     return errorResponse(error);
@@ -78,7 +80,7 @@ async function sendEach(regs: Registration[]) {
 export async function POST(req: Request) {
   try {
     const body = await readJson<Body>(req);
-    const list = recipients();
+    const list = await recipients();
 
     if (body.mode === 'test') {
       const to = String(body.to ?? '').trim();
