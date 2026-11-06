@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { publicBaseUrl } from '@/config/event';
 import { errorResponse, readJson } from '@/lib/api';
 import { getData } from '@/lib/data';
 import { normalizeTicketId } from '@/lib/ids';
@@ -30,6 +31,8 @@ export async function GET() {
       configured: Boolean(from),
       from,
       testTo: process.env.EMAIL_REPLY_TO || from || '',
+      // Where the QR codes and links in the emails point (null: just the ticket ID).
+      linkBase: publicBaseUrl(),
       total,
     });
   } catch (error) {

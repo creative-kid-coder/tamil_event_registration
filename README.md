@@ -107,7 +107,7 @@ All of these are **private** files: none has a public link.
 1. **Connect a Blob store:** in the Vercel project, open **Storage → Blob**, create or choose a store and connect it with the prefix **`TAMIL_EVENT`**. Vercel adds `TAMIL_EVENT_STORE_ID` and `TAMIL_EVENT_READ_WRITE_TOKEN` itself. If you use another prefix, also set `BLOB_ENV_PREFIX` to it.
 2. **Add the other settings** from `.env.local` under **Settings → Environment Variables**: `DESK_PIN`, `ADMIN_PIN`, `SESSION_SECRET`, `TICKET_SECRET`, `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `EMAIL_REPLY_TO`, `EVENT_NAME`, `EVENT_DATE` and `EVENT_VENUE`.
    - `TICKET_SECRET` **must be the same value as on the laptop**, or the QR codes you've already emailed won't scan.
-   - Set `PUBLIC_BASE_URL` to the Vercel address if you'd like QR emails to link to the guest's ticket page.
+   - `PUBLIC_BASE_URL`: leave it **empty** on Vercel, and the QR emails link to the project's own address (e.g. `https://tamil-event-registration.vercel.app`). Set it only for a custom domain, and never leave a placeholder there. **Admin → QR emails** shows the address the links will use.
 3. **Redeploy**, sign in with the admin PIN and **upload the responses CSV** on the Admin page.
 
 The programme's running order comes from `data/schedule.json` in the repository, so edits to it need a redeploy on Vercel.

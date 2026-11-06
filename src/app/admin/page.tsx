@@ -23,6 +23,8 @@ interface EmailStatus {
   from: string | null;
   testTo: string;
   total: number;
+  /** Where the QR codes and links in the emails point; null means just the ticket ID. */
+  linkBase: string | null;
 }
 interface BatchResult {
   sent: number;
@@ -543,6 +545,18 @@ export default function AdminPage() {
               )}
               {mailMsg && <p className="mt-4 rounded-xl bg-surface-2 p-3 text-sm">{mailMsg}</p>}
 
+              {email && (
+                <p className="mt-4 rounded-xl bg-surface-2 p-3 text-xs leading-relaxed text-muted">
+                  {email.linkBase ? (
+                    <>
+                      QR codes and links point to <b className="break-all text-ink">{email.linkBase}</b>. Check this is your app’s address
+                      before sending.
+                    </>
+                  ) : (
+                    <>QR codes hold just the ticket ID (no link), which the desk scanner reads. Set PUBLIC_BASE_URL to add a link.</>
+                  )}
+                </p>
+              )}
               <p className="mt-4 text-xs leading-relaxed text-muted">
                 Sent from your Gmail, about one per second (Gmail allows ~500 a day). Nothing records who was emailed, so
                 sending again from #1 emails everyone again.
