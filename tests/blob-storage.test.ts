@@ -68,12 +68,21 @@ describe('check-ins on Vercel (Blob)', () => {
     for (const r of results) expect(r.checkIn).toEqual(winner);
   });
 
+  it('one desk can check in party after party (the saved file is re-read with a writable ETag)', async () => {
+    for (const t of ['CCCC-0001', 'CCCC-0002', 'CCCC-0003']) {
+      expect((await checkins.checkIn(t, 'Desk 1', badges)).created).toBe(true);
+    }
+    // The desk list, read the plain way, sees them all.
+    const all = await checkins.allCheckIns();
+    expect(['CCCC-0001', 'CCCC-0002', 'CCCC-0003'].every((t) => all.has(t))).toBe(true);
+  });
+
   it('keeps every check-in when different parties arrive at once', async () => {
     const tickets = Array.from({ length: 12 }, (_, i) => `BBBB-${String(i).padStart(4, '0')}`);
     await Promise.all(tickets.map((t, i) => checkins.checkIn(t, `Desk ${(i % 3) + 1}`, badges)));
     const all = await checkins.allCheckIns();
     expect(tickets.every((t) => all.has(t))).toBe(true);
-    expect(all.size).toBe(13);
+    expect(all.size).toBe(16);
   });
 
   it('undo frees the party, and both are in the audit log', async () => {

@@ -7,7 +7,7 @@
  * conditional (ETag), so two desks saving at the same moment can't overwrite
  * each other: the second one re-reads and tries again.
  */
-import { BlobPreconditionFailedError, get, put } from '@vercel/blob';
+import { BlobNotFoundError, BlobPreconditionFailedError, get, head, put } from '@vercel/blob';
 
 /** The connected store's env var prefix, e.g. TAMIL_EVENT → TAMIL_EVENT_READ_WRITE_TOKEN. */
 const ENV_PREFIX = process.env.BLOB_ENV_PREFIX || 'TAMIL_EVENT';
@@ -46,7 +46,11 @@ export interface BlobFile {
 
 export interface BlobClient {
   configured(): boolean;
-  read(pathname: string): Promise<BlobFile | null>;
+  /**
+   * `forUpdate`: the ETag must be the one a conditional write checks against
+   * (only then may the file be saved back with it).
+   */
+  read(pathname: string, options?: { forUpdate?: boolean }): Promise<BlobFile | null>;
   /**
    * `etag`: overwrite only if unchanged since that read; `null`: create only
    * (fails if it exists); `'*'`: overwrite whatever is there.
@@ -57,10 +61,30 @@ export interface BlobClient {
 const vercelBlob: BlobClient = {
   configured: () => blobAuth() !== null,
 
-  async read(pathname) {
-    const result = await get(pathname, { access: 'private', useCache: false, ...requireAuth() });
-    if (!result || result.statusCode !== 200) return null;
-    return { text: await new Response(result.stream).text(), etag: result.blob.etag, uploadedAt: result.blob.uploadedAt };
+  async read(pathname, { forUpdate = false } = {}) {
+    const auth = requireAuth();
+    // The ETag on a download comes from the HTTP response, and can differ from
+    // the one a conditional write compares against (e.g. weak, W/"…", when the
+    // JSON is sent compressed); then every save would look like a conflict.
+    // So before a save, take the ETag from the Blob API (head) first, then the
+    // content: if someone saves in between, the ETag is out of date and the
+    // write is refused and retried, so nothing can be lost.
+    let meta: { etag: string; uploadedAt: Date } | null = null;
+    if (forUpdate) {
+      try {
+        meta = await head(pathname, auth);
+      } catch (error) {
+        if (error instanceof BlobNotFoundError) return null;
+        throw error;
+      }
+    }
+    const result = await get(pathname, { access: 'private', useCache: false, ...auth });
+    if (!result || result.statusCode !== 200) {
+      if (meta) throw new Error(`Couldn't read ${pathname} from Vercel Blob. Please try again.`);
+      return null;
+    }
+    const text = await new Response(result.stream).text();
+    return meta ? { text, ...meta } : { text, etag: result.blob.etag, uploadedAt: result.blob.uploadedAt };
   },
 
   async write(pathname, body, { etag, contentType }) {
@@ -119,7 +143,7 @@ const MAX_ATTEMPTS = 15;
  */
 export async function updateJson<T, R>(pathname: string, empty: () => T, change: (doc: T) => { value: R; save: boolean }): Promise<R> {
   for (let attempt = 1; ; attempt++) {
-    const file = await client.read(pathname);
+    const file = await client.read(pathname, { forUpdate: true });
     const doc = file ? (JSON.parse(file.text) as T) : empty();
     const { value, save } = change(doc);
     if (!save) return value;
@@ -129,7 +153,12 @@ export async function updateJson<T, R>(pathname: string, empty: () => T, change:
       return value;
     } catch (error) {
       if (!(error instanceof BlobConflict) || attempt >= MAX_ATTEMPTS) {
-        throw error instanceof BlobConflict ? new Error('Too many people saving at once. Please try again.') : error;
+        if (error instanceof BlobConflict) {
+          // Shows in the Vercel logs, to tell real crowding apart from a storage problem.
+          console.error(`[blob] gave up saving ${pathname} after ${attempt} conflicts (last ETag ${file?.etag ?? 'none: file did not exist'})`);
+          throw new Error('Too many people saving at once. Please try again.');
+        }
+        throw error;
       }
       await new Promise((resolve) => setTimeout(resolve, 30 + Math.random() * 100 * attempt));
     }
