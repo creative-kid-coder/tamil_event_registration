@@ -5,6 +5,7 @@ import { motion, useTransform } from 'motion/react';
 import { useContext } from 'react';
 import { Avatar } from '@/components/Avatar';
 import { BadgeGrid } from '@/components/BadgeGrid';
+import { EventName } from '@/components/EventName';
 import {
   AlertIcon,
   ArrowLeftIcon,
@@ -112,7 +113,9 @@ function MiniHeader({ event, right, sub = 'Check-in' }: { event: DemoEvent; righ
     <div className="flex items-center gap-2.5 border-b border-line/70 bg-bg/90 px-4 pt-12 pb-2.5">
       <BrandMark className="h-8 w-8 shrink-0" />
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[14px] leading-tight font-semibold">{event.name}</div>
+        <div className="text-[14px] leading-tight font-semibold">
+          <EventName name={event.name} />
+        </div>
         <div className="text-[11px] text-muted">{sub}</div>
       </div>
       {right}
@@ -329,7 +332,9 @@ function TicketScreen({ event, compact = false }: { event: DemoEvent; compact?: 
       <div className="mx-3 overflow-hidden rounded-3xl border border-line bg-surface shadow-card">
         <div className="bg-gradient-to-br from-brand to-brand-strong px-5 pt-5 pb-6 text-on-brand">
           <div className="text-[11px] font-semibold tracking-[0.12em] uppercase opacity-85">Admit · Check-in pass</div>
-          <div className="mt-2 text-xl leading-tight font-semibold">{event.name}</div>
+          <div className="mt-2 text-xl leading-tight font-semibold">
+            <EventName name={event.name} wrap />
+          </div>
           {(event.date || event.venue) && <div className="mt-0.5 text-xs opacity-85">{[event.date, event.venue].filter(Boolean).join(' · ')}</div>}
         </div>
         <div className="border-t-2 border-dashed border-line" />
@@ -371,7 +376,10 @@ export function IntroScene({ event }: { event: DemoEvent }) {
         <h1 className="mt-10 text-8xl font-semibold tracking-tight">How check-in works</h1>
       </Appear>
       <Appear at={0.8} y={16}>
-        <p className="mt-5 text-3xl text-muted">{[event.name, event.date].filter(Boolean).join(' · ')}</p>
+        <p className="mt-5 text-3xl text-muted">
+          <EventName name={event.name} wrap />
+          {event.date && ` · ${event.date}`}
+        </p>
       </Appear>
       <div className="mt-16 flex gap-5">
         {parts.map((c, i) => (
@@ -477,7 +485,9 @@ export function BeforeScene({ event }: { event: DemoEvent }) {
         <Laptop className="absolute top-[110px] left-[58px]">
           <div className="flex items-center gap-2.5 border-b border-line px-5 py-3">
             <BrandMark className="h-8 w-8" />
-            <span className="flex-1 font-semibold">{event.name}</span>
+            <span className="min-w-0 flex-1 font-semibold">
+            <EventName name={event.name} />
+          </span>
             <span className="pill bg-surface-2 text-muted">Admin</span>
           </div>
           <div className="p-8">
@@ -524,7 +534,9 @@ export function BeforeScene({ event }: { event: DemoEvent }) {
                     </span>
                     Gmail · now
                   </div>
-                  <div className="mt-1.5 text-[15px] font-semibold">{event.name}</div>
+                  <div className="mt-1.5 text-[15px] font-semibold">
+                    <EventName name={event.name} />
+                  </div>
                   <div className="text-sm leading-snug text-muted">Your check-in QR code: show it at the desk</div>
                   <Tap at={CUE.openEmail - 0.25} x="55%" y="55%" />
                 </div>
@@ -705,7 +717,9 @@ export function DashboardScene({ event }: { event: DemoEvent }) {
       <Laptop className="absolute top-[90px] left-[58px]">
         <div className="flex items-center gap-2.5 border-b border-line px-5 py-2.5">
           <BrandMark className="h-8 w-8" />
-          <span className="flex-1 font-semibold">{event.name}</span>
+          <span className="min-w-0 flex-1 font-semibold">
+            <EventName name={event.name} />
+          </span>
           <div className="flex gap-1 rounded-xl bg-surface-2 p-1 text-sm font-medium">
             <span className="px-3 py-1 text-muted">Desk</span>
             <span className="rounded-lg bg-surface px-3 py-1 shadow-sm">Admin</span>
@@ -876,7 +890,9 @@ export function ProgrammeScene({ event }: { event: DemoEvent }) {
           <div className="mx-auto mt-6 w-56 rounded-2xl bg-white p-3 ring-1 ring-black/5">
             <Qr svg={posterQr} />
           </div>
-          <div className="mt-5 truncate text-base font-medium">{event.name}</div>
+          <div className="mt-5 text-base font-medium">
+            <EventName name={event.name} />
+          </div>
         </motion.div>
       </Appear>
 
@@ -955,7 +971,7 @@ export function OutroScene({ event }: { event: DemoEvent }) {
         </span>
       </Appear>
       <Appear at={84.8} className="mt-12 flex items-center gap-3 text-xl font-medium">
-        <BrandMark className="h-9 w-9" /> {event.name}
+        <BrandMark className="h-9 w-9" /> <EventName name={event.name} />
       </Appear>
     </Scene>
   );

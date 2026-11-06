@@ -4,6 +4,7 @@ import { animate, motion, useMotionValue, useTransform, type AnimationPlaybackCo
 import QRCode from 'qrcode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BrandMark, ChevronRightIcon, PauseIcon } from '@/components/icons';
+import { EventName } from '@/components/EventName';
 import { Appear, AssetsContext, TimeContext, useDerived, useTime } from './kit';
 import { BeforeScene, DashboardScene, DeskScene, IntroScene, OutroScene, ProgrammeScene, type DemoEvent } from './scenes';
 import { CAPTIONS, CHAPTERS, chapterEnd, DURATION } from './timeline';
@@ -191,7 +192,9 @@ function Body({ event, onSeek }: { event: DemoEvent; onSeek?: (seconds: number) 
       <div className="absolute top-8 left-24 flex items-center gap-3.5">
         <BrandMark className="h-11 w-11" />
         <div>
-          <div className="text-xl leading-tight font-semibold">{event.name}</div>
+          <div className="text-xl leading-tight font-semibold">
+            <EventName name={event.name} />
+          </div>
           <div className="text-base text-muted">How check-in works</div>
         </div>
       </div>

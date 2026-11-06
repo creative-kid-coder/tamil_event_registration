@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { EventName } from '@/components/EventName';
 import { BrandMark, CalendarIcon, LayoutIcon, MapPinIcon } from '@/components/icons';
 import { PulseDot, ScheduleBoard } from '@/components/ScheduleList';
 import { apiCall } from '@/lib/client';
@@ -47,7 +48,9 @@ export function ScheduleView({ event, initialItems, initialError, initialUpdated
         <div className="mx-auto flex max-w-lg items-center gap-3 px-4 py-2.5">
           <BrandMark className="h-9 w-9 shrink-0" />
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-[15px] leading-tight font-semibold">{event.name}</h1>
+            <h1 className="text-[15px] leading-tight font-semibold">
+              <EventName name={event.name} />
+            </h1>
             <p className="text-xs text-muted">Programme</p>
           </div>
           {offline ? (

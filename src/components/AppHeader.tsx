@@ -3,6 +3,7 @@
 import type { Session } from '@/lib/auth';
 import { logout } from '@/lib/client';
 import { Avatar } from './Avatar';
+import { EventName } from './EventName';
 import { BrandMark, CalendarIcon, LayoutIcon, LogOutIcon, ScanIcon } from './icons';
 
 interface Props {
@@ -31,7 +32,9 @@ export function AppHeader({ session, eventName, active }: Props) {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
         <BrandMark className="h-9 w-9 shrink-0" />
         <div className="min-w-0 flex-1">
-          <div className="truncate text-[15px] font-semibold leading-tight">{eventName || 'Event check-in'}</div>
+          <div className="text-[15px] font-semibold leading-tight">
+            <EventName name={eventName || 'Event check-in'} />
+          </div>
           <div className="text-xs text-muted">Check-in</div>
         </div>
 

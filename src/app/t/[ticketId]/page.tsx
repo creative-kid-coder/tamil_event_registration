@@ -1,5 +1,6 @@
 import QRCode from 'qrcode';
 import { BadgeGrid } from '@/components/BadgeGrid';
+import { EventName } from '@/components/EventName';
 import { BrandMark, CalendarIcon, CheckCircleIcon } from '@/components/icons';
 import { EVENT, ticketUrl } from '@/config/event';
 import { findByTicket, getData } from '@/lib/data';
@@ -34,7 +35,9 @@ export default async function TicketPage({ params }: { params: Promise<{ ticketI
             <BrandMark className="h-6 w-6 bg-white/20 from-transparent to-transparent shadow-none" />
             Admit · Check-in pass
           </div>
-          <h1 className="relative mt-4 text-2xl font-semibold tracking-tight">{EVENT.name}</h1>
+          <h1 className="relative mt-4 text-2xl font-semibold tracking-tight">
+            <EventName name={EVENT.name} wrap />
+          </h1>
           {(EVENT.date || EVENT.venue) && (
             <p className="relative mt-1 text-sm opacity-85">{[EVENT.date, EVENT.venue].filter(Boolean).join(' · ')}</p>
           )}

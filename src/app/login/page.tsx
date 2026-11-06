@@ -1,4 +1,5 @@
 import { BrandMark } from '@/components/icons';
+import { EventName } from '@/components/EventName';
 import { EVENT } from '@/config/event';
 import { LoginForm } from './LoginForm';
 
@@ -12,7 +13,9 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm">
         <div className="mb-8 text-center">
           <BrandMark className="h-14 w-14" />
-          <h1 className="mt-5 text-2xl font-semibold tracking-tight">{EVENT.name}</h1>
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">
+            <EventName name={EVENT.name} wrap />
+          </h1>
           <p className="mt-1 text-sm text-muted">{[EVENT.date, 'Check-in'].filter(Boolean).join(' · ')}</p>
         </div>
 
