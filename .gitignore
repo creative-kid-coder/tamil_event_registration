@@ -1,0 +1,27 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+.vercel/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets: every env file (including copies like .env.local.old),
+# except the blank template
+.env*
+!.env.example
+
+# Personal data (lives on the venue laptop only)
+# - form responses: names, mobiles, emails
+data/*.csv
+# - check-in database and its WAL files
+data/*.db
+data/*.db-*
+
+# Logs and OS/editor clutter
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini

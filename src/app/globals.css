@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Every colour the UI uses comes from here, so light and dark
+ * mode (following the device setting) stay consistent everywhere.
+ * Badge colours are separate: they match the physical badges (config/badges.ts).
+ */
+:root {
+  color-scheme: light;
+  --bg: #f5f6fa;
+  --bg-glow: #e9e8ff;
+  --surface: #ffffff;
+  --surface-2: #f3f4f8;
+  --line: #e4e6ee;
+  --ink: #12141c;
+  --muted: #646b7f;
+  --brand: #5046e5;
+  --brand-strong: #3f35c9;
+  --brand-soft: #eeedff;
+  --on-brand: #ffffff;
+  --success: #0b7a55;
+  --on-success: #ffffff;
+  --success-soft: #e6f6ef;
+  --warning: #9a5b00;
+  --on-warning: #ffffff;
+  --warning-soft: #fff4dc;
+  --warning-line: #f3c461;
+  --danger: #c22a2a;
+  --danger-soft: #fdecec;
+  --shadow: 0 1px 2px rgb(16 18 27 / 0.04), 0 4px 16px -4px rgb(16 18 27 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0c0e14;
+    --bg-glow: #1b1840;
+    --surface: #151821;
+    --surface-2: #1c202b;
+    --line: #272c39;
+    --ink: #eceef4;
+    --muted: #949bb0;
+    --brand: #8b85ff;
+    --brand-strong: #a8a3ff;
+    --brand-soft: #232048;
+    --on-brand: #0c0e14;
+    --success: #4fd1a1;
+    --on-success: #06281d;
+    --success-soft: #0f2b22;
+    --warning: #f6c25b;
+    --on-warning: #2a1d02;
+    --warning-soft: #2c220c;
+    --warning-line: #6b5113;
+    --danger: #ff8a8a;
+    --danger-soft: #331517;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-success: var(--success);
+  --color-on-success: var(--on-success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-on-warning: var(--on-warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-line: var(--warning-line);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --shadow-card: var(--shadow);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 50% -200px, var(--bg-glow), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-surface shadow-card;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-brand text-on-brand shadow-sm hover:bg-brand-strong active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply border border-line bg-surface text-ink hover:bg-surface-2 active:scale-[0.98];
+  }
+  .btn-ghost {
+    @apply text-muted hover:bg-surface-2 hover:text-ink;
+  }
+  .btn-success {
+    @apply bg-success text-on-success shadow-sm hover:brightness-110 active:scale-[0.99];
+  }
+  .btn-warning {
+    @apply bg-warning text-on-warning hover:brightness-110;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-ink placeholder:text-muted/70 transition
+      focus:border-brand focus:ring-4 focus:ring-brand/15 focus:outline-none
+      disabled:opacity-60;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium tracking-wide text-muted uppercase;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.08em] text-muted uppercase;
+  }
+}
+
+.avatar {
+  background: hsl(var(--hue) 80% 94%);
+  color: hsl(var(--hue) 55% 32%);
+}
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    background: hsl(var(--hue) 35% 22%);
+    color: hsl(var(--hue) 80% 82%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 220ms ease-out both;
+}
+
+/* Bottom sheet (admin programme controls) */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.animate-sheet {
+  animation: sheet-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.animate-fade {
+  animation: fade-in 200ms ease-out both;
+}
