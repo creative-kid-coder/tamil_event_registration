@@ -1,72 +1,41 @@
 {
   "items": [
-    {
-      "id": "doors",
-      "title": "Doors open & check-in",
-      "start": "16:30",
-      "end": "17:15",
-      "place": "Entrance",
-      "kind": "other",
-      "description": "Show your QR code at the welcome desk to collect your food badges."
-    },
-    {
-      "id": "welcome",
-      "title": "Welcome & lamp lighting",
-      "start": "17:15",
-      "end": "17:30",
-      "place": "Main hall",
-      "kind": "stage",
-      "forWho": "Everyone"
-    },
-    {
-      "id": "cultural",
-      "title": "Cultural programme",
-      "start": "17:30",
-      "end": "19:00",
-      "place": "Main hall",
-      "kind": "stage",
-      "description": "Dance, music and drama performances."
-    },
-    {
-      "id": "kids-corner",
-      "title": "Kids' activities",
-      "start": "17:30",
-      "end": "18:30",
-      "place": "Kids' corner",
-      "kind": "kids",
-      "forWho": "Kids up to 10",
-      "description": "Diya painting, colouring and games."
-    },
-    {
-      "id": "dinner",
-      "title": "Dinner",
-      "start": "19:00",
-      "end": "20:00",
-      "place": "Dining hall",
-      "kind": "food",
-      "description": "Please have your food badges ready."
-    },
-    {
-      "id": "games",
-      "title": "Family games",
-      "start": "20:00",
-      "end": "20:45",
-      "place": "Main hall",
-      "kind": "game"
-    },
-    {
-      "id": "prizes",
-      "title": "Prizes & thank you",
-      "start": "20:45",
-      "end": "21:00",
-      "place": "Main hall",
-      "kind": "stage"
-    },
-    {
-      "id": "close",
-      "title": "Close",
-      "start": "21:00",
-      "kind": "other"
-    }
+    { "id": "registration", "title": "Registration", "start": "10:00", "end": "10:45", "kind": "other", "description": "Show your QR code at the welcome desk to collect your food badges." },
+    { "id": "welcome", "title": "Lamp lighting, welcome speech & Tamil Thai Vazhthu", "start": "10:45", "end": "11:00", "kind": "stage" },
+
+    { "id": "perf-01", "title": "Performance 1 · Dance", "start": "11:00", "end": "11:05", "kind": "stage" },
+    { "id": "perf-02", "title": "Performance 2 · Dance", "start": "11:13", "end": "11:15", "kind": "stage" },
+    { "id": "perf-03", "title": "Performance 3 · Singing", "start": "11:18", "end": "11:23", "kind": "stage" },
+    { "id": "perf-04", "title": "Performance 4 · Dance", "start": "11:26", "end": "11:28", "kind": "stage" },
+    { "id": "perf-05", "title": "Performance 5 · Dance", "start": "11:31", "end": "11:35", "kind": "stage" },
+    { "id": "perf-06", "title": "Performance 6 · Dance", "start": "11:40", "end": "11:43", "kind": "stage" },
+    { "id": "perf-07", "title": "Performance 7 · Dance", "start": "11:46", "end": "11:51", "kind": "stage" },
+    { "id": "perf-08", "title": "Performance 8 · Dance", "start": "11:54", "end": "11:58", "kind": "stage" },
+    { "id": "perf-09", "title": "Performance 9 · Dance", "start": "12:01", "end": "12:06", "kind": "stage" },
+    { "id": "perf-10", "title": "Performance 10 · Dance", "start": "12:09", "end": "12:14", "kind": "stage" },
+    { "id": "perf-11", "title": "Performance 11 · Dance", "start": "12:20", "end": "12:25", "kind": "stage" },
+    { "id": "perf-12", "title": "Performance 12 · Dance", "start": "12:28", "end": "12:33", "kind": "stage" },
+    { "id": "perf-13", "title": "Performance 13 · Dance", "start": "12:38", "end": "12:43", "kind": "stage" },
+
+    { "id": "lunch", "title": "Lunch break", "start": "12:45", "end": "14:45", "kind": "food", "description": "Please have your food badges ready." },
+
+    { "id": "perf-14", "title": "Performance 14 · Singing", "start": "14:45", "end": "14:51", "kind": "stage" },
+    { "id": "perf-15", "title": "Performance 15 · Keyboard", "start": "14:54", "end": "14:57", "kind": "stage" },
+    { "id": "perf-16", "title": "Performance 16 · Keyboard", "start": "15:00", "end": "15:05", "kind": "stage" },
+    { "id": "perf-17", "title": "Performance 17 · Dance", "start": "15:08", "end": "15:13", "kind": "stage" },
+    { "id": "perf-18", "title": "Performance 18 · Fashion walk", "start": "15:16", "end": "15:21", "kind": "stage" },
+    { "id": "perf-19", "title": "Performance 19 · Dance", "start": "15:25", "end": "15:30", "kind": "stage" },
+    { "id": "perf-20", "title": "Performance 20 · Dance", "start": "15:33", "end": "15:39", "kind": "stage" },
+    { "id": "perf-21", "title": "Performance 21 · Dance", "start": "15:42", "end": "15:47", "kind": "stage" },
+    { "id": "perf-22", "title": "Performance 22 · Dance", "start": "15:50", "end": "15:53", "kind": "stage" },
+    { "id": "perf-23", "title": "Performance 23 · Dance", "start": "15:56", "end": "16:01", "kind": "stage" },
+    { "id": "perf-24", "title": "Performance 24 · Dance", "start": "16:04", "end": "16:06", "kind": "stage" },
+    { "id": "perf-25", "title": "Performance 25 · Group singing", "start": "16:10", "end": "16:20", "kind": "stage" },
+
+    { "id": "tea", "title": "Tea break", "start": "16:20", "end": "16:40", "kind": "food" },
+
+    { "id": "games", "title": "Games", "start": "16:40", "end": "17:00", "kind": "game" },
+    { "id": "dj", "title": "DJ dance floor", "start": "17:00", "end": "17:30", "kind": "other" },
+    { "id": "cleaning", "title": "Hall cleaning", "start": "17:30", "end": "18:00", "kind": "other" }
   ]
 }
