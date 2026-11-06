@@ -25,3 +25,6 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Demo video output (npm run demo:render)
+/demo/

@@ -170,6 +170,18 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
 
 ---
 
+## Demo video
+
+An 88-second animation of how the app works, built with [Motion](https://motion.dev), for volunteer training, guests and the committee. Its four chapters are Before the day, At the desk, Live dashboard and Live programme. All names, numbers and tickets in it are made up; only the event name and date come from your `.env.local`.
+
+**Make the MP4:** `npm run demo:render` (needs ffmpeg: `winget install --id Gyan.FFmpeg`). It builds the app, renders every frame in headless Chrome, and writes `demo/how-it-works.mp4`: 1920×1080, 30 fps, with chapter markers that players like VLC let you jump between. Rendering takes a few minutes, and the `demo/` folder is not committed to git.
+
+**Watch it live** with Pause, Back and Next (Space and the arrow keys also work): start the app with `ENABLE_DEMO=1`, then open `/demo`. The page is switched off otherwise, so it never shows at the venue.
+
+**After changing the app**, run `npm run demo:render` again; the video reuses the real badge colours, badge tiles and programme cards. The storyboard (captions and timings) is in [src/app/demo/timeline.ts](src/app/demo/timeline.ts).
+
+---
+
 ## Project layout
 
 ```
@@ -191,5 +203,7 @@ src/
   lib/mailer.ts           QR email via Gmail (SMTP + app password)
   middleware.ts           protects /desk, /admin and the APIs
   app/…                   pages (login, desk, admin, admin/schedule, schedule, t/[ticketId]) and API routes
+  app/demo/               the demo animation (Motion), off unless ENABLE_DEMO=1
+scripts/render-demo.mjs   renders the demo to demo/how-it-works.mp4
 tests/                    unit tests + made-up fixture data
 ```
