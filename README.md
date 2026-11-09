@@ -198,9 +198,12 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
 
 ## Sponsor ticker
 
-Your sponsors roll along a ticker fixed to the bottom of every page, for guests and staff alike. It opens with the Tamil thank-you, then shows each tier's badge followed by that tier's sponsors, each with a small image and their name.
+Your sponsors drift along a light bar fixed to the bottom of every page, for guests and staff alike.
+- **Heading:** the full 🪔 Tamil thank-you sits above the row, always shown in full. It's one line on a laptop and wraps onto more on a phone. Pages leave exactly enough room for the bar, however tall it is.
+- **The row:** grouped by tier, Platinum first. Each tier's coloured badge is followed by its sponsor images, all the same height, with a thin divider before the next tier. The row loops slowly and fades out at both ends.
+- **Best images:** logos with a transparent background, ideally wider than tall, look best. Portrait flyers work but show small, so people tap them to read them.
 - **Enlarged view:** tapping a sponsor opens their image large. Close it with the ✕ at the top, by tapping outside, or with Esc. Tap the image to zoom in on a flyer's small print, and again to fit it back to the screen. Use ‹ ›, swipe, or the arrow keys to move between sponsors.
-- **Pausing:** the ticker stops while someone hovers over it or has a sponsor open, and its ⏸ button pauses it.
+- **Pausing:** the row stops while someone hovers over the images or has a sponsor open, and its ⏸ button pauses it.
 - **Reduce motion:** on devices with "reduce motion" turned on, it stands still and can be swiped sideways instead.
 - **Thank-you wording:** change it in `sponsorThanks` in `src/config/sponsors.ts`.
 
