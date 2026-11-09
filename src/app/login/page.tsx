@@ -24,6 +24,12 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted">Ask the organiser for the PIN.</p>
+        <p className="mt-2 text-center text-xs text-muted">
+          Guest?{' '}
+          <a href="/" className="font-medium text-brand">
+            See the programme
+          </a>
+        </p>
       </div>
     </main>
   );

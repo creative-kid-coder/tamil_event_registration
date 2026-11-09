@@ -4,6 +4,15 @@ import { sessionFrom } from '@/lib/auth';
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const session = await sessionFrom(req);
+
+  // The home page is for guests; signed-in volunteers and organisers go straight to the desk.
+  if (pathname === '/') {
+    if (!session) return NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.pathname = '/desk';
+    return NextResponse.redirect(url);
+  }
+
   const adminOnly = pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
 
   if (session && (!adminOnly || session.role === 'admin')) return NextResponse.next();
@@ -21,5 +30,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/desk/:path*', '/admin/:path*', '/api/registrations/:path*', '/api/checkin/:path*', '/api/admin/:path*'],
+  matcher: ['/', '/desk/:path*', '/admin/:path*', '/api/registrations/:path*', '/api/checkin/:path*', '/api/admin/:path*'],
 };

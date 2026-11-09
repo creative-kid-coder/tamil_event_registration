@@ -2,6 +2,7 @@
 
 Check-in for an event whose registrations came from a Google Form. Volunteers scan a guest's QR code (or search by name / mobile), hand over the coloured food badges shown, and tap **Check in**. If the same party turns up at another desk, that desk sees **"ALREADY CHECKED IN at 18:42 by Desk 2"**.
 
+- **Home** (`/`): for guests, with the event, what's on now, and a button to the programme, plus a small "Staff sign-in" link. Signed-in volunteers and organisers go straight to the desk instead.
 - **Desk** (`/desk`): QR scan, instant search, badge counts per category, check-in, undo.
 - **Admin** (`/admin`): arrivals, badges handed out against expected, recent check-ins, not yet arrived, data issues, QR emails (sent from your Gmail), CSV export.
 - **Guest page** (`/t/<ticket>`): first name and booking counts only.
@@ -194,6 +195,40 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
 - **Share with guests:** shows a QR code and link to `/schedule` for the projector or posters. Open the admin page through the **tunnel address** (not `localhost`) so the QR works on guests' phones. The quick-tunnel address changes each time you start it, so print posters only after starting the tunnel for the day. The ticket page also links to the programme.
 
 ---
+
+## Sponsor ticker
+
+Your sponsors roll along a ticker fixed to the bottom of every page, for guests and staff alike. It opens with the Tamil thank-you, then shows each tier's badge followed by that tier's sponsors, each with a small image and their name.
+- **Enlarged view:** tapping a sponsor opens their image large. Close it with the ✕ at the top, by tapping outside, or with Esc. Tap the image to zoom in on a flyer's small print, and again to fit it back to the screen. Use ‹ ›, swipe, or the arrow keys to move between sponsors.
+- **Pausing:** the ticker stops while someone hovers over it or has a sponsor open, and its ⏸ button pauses it.
+- **Reduce motion:** on devices with "reduce motion" turned on, it stands still and can be swiped sideways instead.
+- **Thank-you wording:** change it in `sponsorThanks` in `src/config/sponsors.ts`.
+
+Each tier has its own folder, shown in this order:
+
+| Tier | Folder |
+|---|---|
+| Platinum | `public/sponsors/platinum/` |
+| Gold | `public/sponsors/gold/` |
+| Silver | `public/sponsors/silver/` |
+| Associate | `public/sponsors/associate/` |
+| Community | `public/sponsors/community/` |
+
+Any other folder you add (e.g. `media-partners/`) also shows, after these, as "Media Partners".
+
+**To add a sponsor**, copy their logo or flyer into the right folder: PNG, JPG, SVG or WebP, any shape (portrait flyers are fine).
+- **Display name:** taken from the file name, so `acme-foods.png` and `AcmeFoods.png` both show as "Acme Foods".
+- **Order:** by file name. Start names with `01-`, `02-` … to choose it.
+- **Other details (optional)** go in `data/sponsors.json`, keyed by `"<folder>/<file name>"`, and show in the enlarged view:
+  - a different display name;
+  - a one-line **tagline**;
+  - a **website** (`https://…`), shown as a **Visit website** button.
+
+```json
+"gold/acme-foods.png": { "name": "Acme Foods Ltd", "tagline": "Fresh every day", "url": "https://acme.example" }
+```
+
+To show new images, restart `npm run venue` on the laptop, or commit, push and redeploy on Vercel. Empty tiers are skipped, and with no sponsor images at all there's no ticker.
 
 ## Demo video
 

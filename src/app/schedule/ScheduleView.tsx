@@ -46,7 +46,9 @@ export function ScheduleView({ event, initialItems, initialError, initialUpdated
     <>
       <header className="sticky top-0 z-20 border-b border-line/70 bg-bg/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-lg items-center gap-3 px-4 py-2.5">
-          <BrandMark className="h-9 w-9 shrink-0" />
+          <a href="/" aria-label="Event home" className="shrink-0">
+            <BrandMark className="h-9 w-9" />
+          </a>
           <div className="min-w-0 flex-1">
             <h1 className="text-[15px] leading-tight font-semibold">
               <EventName name={event.name} />
@@ -69,22 +71,20 @@ export function ScheduleView({ event, initialItems, initialError, initialUpdated
       </header>
 
       <main className="mx-auto max-w-lg px-4 pt-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))] sm:pt-6">
-        {(event.date || event.venue) && (
-          <p className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-sm text-muted">
-            {event.date && (
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarIcon className="h-4 w-4 shrink-0" />
-                {event.date}
-              </span>
-            )}
-            {event.venue && (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPinIcon className="h-4 w-4 shrink-0" />
-                {event.venue}
-              </span>
-            )}
-          </p>
-        )}
+        <p className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 text-sm text-muted">
+          {event.date && (
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarIcon className="h-4 w-4 shrink-0" />
+              {event.date}
+            </span>
+          )}
+          {event.venue && (
+            <span className="inline-flex items-center gap-1.5">
+              <MapPinIcon className="h-4 w-4 shrink-0" />
+              {event.venue}
+            </span>
+          )}
+        </p>
 
         {offline && (
           <p className="mb-5 rounded-2xl bg-warning-soft p-3.5 text-sm text-warning">

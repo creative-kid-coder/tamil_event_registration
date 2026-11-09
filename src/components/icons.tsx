@@ -127,6 +127,12 @@ export const PauseIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const PlayIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M7 4.5v15a.5.5 0 0 0 .77.42l11.5-7.5a.5.5 0 0 0 0-.84L7.77 4.08A.5.5 0 0 0 7 4.5Z" />
+  </Icon>
+);
+
 export const DownloadIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M12 3v12M7 10l5 5 5-5M4 21h16" />
@@ -232,6 +238,47 @@ export const CopyIcon = (p: IconProps) => (
   <Icon {...p}>
     <rect x="9" y="9" width="11" height="11" rx="2" />
     <path d="M5 15V6a2 2 0 0 1 2-2h8" />
+  </Icon>
+);
+
+export const ZoomInIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5M11 8v6M8 11h6" />
+  </Icon>
+);
+
+export const GemIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 3h12l4 6-10 12L2 9z" />
+    <path d="M2 9h20M12 21 8 9l4-6 4 6z" />
+  </Icon>
+);
+
+export const StarIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z" />
+  </Icon>
+);
+
+export const MedalIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M8 3h8l-2.5 6h-3zM7.5 3 10 9M16.5 3 14 9" />
+    <circle cx="12" cy="15" r="6" />
+    <path d="M12 12.5v5" />
+  </Icon>
+);
+
+export const AwardIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="9" r="6" />
+    <path d="m8.5 14 -1.5 7 5-2.5 5 2.5-1.5-7" />
+  </Icon>
+);
+
+export const HeartIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 20s-7.5-4.6-9-9.4C1.9 7.1 4.2 4 7.4 4c1.9 0 3.4 1 4.6 2.6C13.2 5 14.7 4 16.6 4c3.2 0 5.5 3.1 4.4 6.6C19.5 15.4 12 20 12 20z" />
   </Icon>
 );
 

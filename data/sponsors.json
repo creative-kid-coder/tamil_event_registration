@@ -1,0 +1,38 @@
+{
+  "_how_to": "Optional details for each sponsor image, keyed by \"<tier folder>/<file name>\", shown when someone taps the sponsor in the ticker. name: their display name (otherwise taken from the file name). tagline: one short line. url: their website (https://…).",
+  "associate/SouthendFishers.jpeg": {
+    "name": "Southend Fishers",
+    "tagline": "",
+    "url": ""
+  },
+  "community/AppGoodFood.jpeg": {
+    "name": "App Good Food",
+    "tagline": "",
+    "url": ""
+  },
+  "gold/AhilanStores.svg": {
+    "name": "Ahilan Stores",
+    "tagline": "",
+    "url": ""
+  },
+  "platinum/LifelineProtect.jpeg": {
+    "name": "Lifeline Protect",
+    "tagline": "",
+    "url": ""
+  },
+  "silver/LeoGlobal.jpeg": {
+    "name": "Leo Global",
+    "tagline": "",
+    "url": ""
+  },
+  "silver/Mantra.jpeg": {
+    "name": "Mantra",
+    "tagline": "",
+    "url": ""
+  },
+  "silver/SuriyaCarFix.jpeg": {
+    "name": "Suriya Car Fix",
+    "tagline": "",
+    "url": ""
+  }
+}

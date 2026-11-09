@@ -7,6 +7,9 @@
 
 const LEADING_EMOJI = /^(\p{Extended_Pictographic}(?:️|\p{Emoji_Modifier}|‍\p{Extended_Pictographic})*)\s*/u;
 
+/** The event name without its leading emoji, for use inside a sentence. */
+export const plainEventName = (name: string) => name.replace(LEADING_EMOJI, '');
+
 export function Diya({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 48 48" className={className} aria-hidden="true">

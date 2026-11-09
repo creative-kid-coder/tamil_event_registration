@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
  * unlock the screen or switch back from another app, so this listens for page
  * visibility too. Polling pauses while the page is hidden, to save battery.
  */
-export function useLiveRefresh(load: () => unknown, ms: number) {
+export function useLiveRefresh(load: () => unknown, ms: number, { immediately = false }: { immediately?: boolean } = {}) {
   const latest = useRef(load);
   useEffect(() => {
     latest.current = load;
@@ -36,6 +36,7 @@ export function useLiveRefresh(load: () => unknown, ms: number) {
       }
     };
 
+    if (immediately) run();
     start();
     document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('focus', run);
@@ -48,5 +49,5 @@ export function useLiveRefresh(load: () => unknown, ms: number) {
       window.removeEventListener('online', run);
       window.removeEventListener('pageshow', run);
     };
-  }, [ms]);
+  }, [ms, immediately]);
 }

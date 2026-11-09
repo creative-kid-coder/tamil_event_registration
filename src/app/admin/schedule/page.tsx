@@ -209,7 +209,8 @@ export default function AdminSchedulePage() {
       </main>
 
       {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        // Sits just above the sponsor ticker (--ticker-h is 0 when there isn't one).
+        <div className="pointer-events-none fixed inset-x-0 bottom-[var(--ticker-h,0px)] z-30 flex justify-center px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div
             role="status"
             className={`animate-rise pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl px-4 py-3 shadow-card ${

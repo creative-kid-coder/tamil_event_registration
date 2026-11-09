@@ -6,26 +6,23 @@ import { Avatar } from './Avatar';
 import { EventName } from './EventName';
 import { BrandMark, CalendarIcon, LayoutIcon, LogOutIcon, ScanIcon } from './icons';
 
+type Tab = 'desk' | 'admin' | 'schedule';
+
 interface Props {
   session: Session | null;
   eventName?: string;
-  active: 'desk' | 'admin' | 'schedule';
+  active: Tab;
 }
 
-/** Sticky top bar shared by the desk, admin and programme pages. */
+const TABS: { key: Tab; href: string; label: string; Icon: (p: { className?: string }) => React.ReactNode }[] = [
+  { key: 'desk', href: '/desk', label: 'Desk', Icon: ScanIcon },
+  { key: 'admin', href: '/admin', label: 'Admin', Icon: LayoutIcon },
+  { key: 'schedule', href: '/admin/schedule', label: 'Programme', Icon: CalendarIcon },
+];
+
+/** Sticky top bar shared by the staff pages (desk, admin, programme). */
 export function AppHeader({ session, eventName, active }: Props) {
-  const tab = (href: string, key: Props['active'], label: string, icon: React.ReactNode) => (
-    <a
-      href={href}
-      aria-current={active === key ? 'page' : undefined}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-        active === key ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
-      }`}
-    >
-      {icon}
-      {label}
-    </a>
-  );
+  const showTabs = session?.role === 'admin';
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-bg/80 backdrop-blur-xl">
@@ -38,11 +35,21 @@ export function AppHeader({ session, eventName, active }: Props) {
           <div className="text-xs text-muted">Check-in</div>
         </div>
 
-        {session?.role === 'admin' && (
+        {showTabs && (
           <nav className="hidden items-center gap-1 rounded-xl bg-surface-2 p-1 sm:flex">
-            {tab('/desk', 'desk', 'Desk', <ScanIcon className="h-4 w-4" />)}
-            {tab('/admin', 'admin', 'Admin', <LayoutIcon className="h-4 w-4" />)}
-            {tab('/admin/schedule', 'schedule', 'Programme', <CalendarIcon className="h-4 w-4" />)}
+            {TABS.map(({ key, href, label, Icon }) => (
+              <a
+                key={key}
+                href={href}
+                aria-current={active === key ? 'page' : undefined}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                  active === key ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </a>
+            ))}
           </nav>
         )}
 
@@ -59,12 +66,23 @@ export function AppHeader({ session, eventName, active }: Props) {
         )}
       </div>
 
-      {session?.role === 'admin' && (
-        <nav className="mx-auto flex max-w-6xl gap-1 px-4 pb-2 sm:hidden">
-          <div className="flex gap-1 rounded-xl bg-surface-2 p-1">
-            {tab('/desk', 'desk', 'Desk', <ScanIcon className="h-4 w-4" />)}
-            {tab('/admin', 'admin', 'Admin', <LayoutIcon className="h-4 w-4" />)}
-            {tab('/admin/schedule', 'schedule', 'Programme', <CalendarIcon className="h-4 w-4" />)}
+      {/* Phones: three equal tabs, icon above label, so they fit even on the smallest screens. */}
+      {showTabs && (
+        <nav className="mx-auto max-w-6xl px-4 pb-2 sm:hidden">
+          <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1">
+            {TABS.map(({ key, href, label, Icon }) => (
+              <a
+                key={key}
+                href={href}
+                aria-current={active === key ? 'page' : undefined}
+                className={`flex min-w-0 flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[11px] leading-tight font-medium transition ${
+                  active === key ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'
+                }`}
+              >
+                <Icon className="h-[18px] w-[18px]" />
+                <span className="max-w-full truncate">{label}</span>
+              </a>
+            ))}
           </div>
         </nav>
       )}
