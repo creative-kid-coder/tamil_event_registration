@@ -3,7 +3,7 @@
 import QRCode from 'qrcode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
-import { AlertIcon, ArrowRightIcon, CheckIcon, CopyIcon, DownloadIcon, ExternalIcon, MoreIcon, XIcon } from '@/components/icons';
+import { AlertIcon, ArrowRightIcon, CheckIcon, CopyIcon, DownloadIcon, ExternalIcon, MonitorIcon, MoreIcon, XIcon } from '@/components/icons';
 import { KindIcon, ScheduleBoard, type ScheduleManage } from '@/components/ScheduleList';
 import type { Session } from '@/lib/auth';
 import { apiCall } from '@/lib/client';
@@ -443,6 +443,15 @@ function ShareCard() {
           </div>
         </div>
       </div>
+
+      <a href="/screen" target="_blank" rel="noreferrer" className="btn btn-secondary mt-4 min-h-11 w-full">
+        <MonitorIcon className="h-4 w-4" />
+        Open the projector screen
+      </a>
+      <p className="mt-2 text-xs text-muted">
+        For the hall&apos;s projector or TV: what&apos;s on now and next, the sponsors taking turns, and this QR. Open it on the laptop connected to
+        the projector and press Full screen.
+      </p>
     </section>
   );
 }

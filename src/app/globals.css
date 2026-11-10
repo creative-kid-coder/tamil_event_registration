@@ -320,6 +320,13 @@ body {
     --glow-peak: rgb(251 191 36 / 0.9);
   }
 }
+/* The projector screen is always dark, so always bright gold there */
+.screen .thanks-text {
+  --gold: linear-gradient(180deg, #fff4c7 0%, #fcd34d 45%, #f59e0b 100%);
+  --shine: rgb(255 255 255 / 0.95);
+  --glow: rgb(251 191 36 / 0.35);
+  --glow-peak: rgb(251 191 36 / 0.9);
+}
 @keyframes thanks-shine {
   0% {
     background-position:

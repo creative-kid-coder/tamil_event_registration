@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { Bi } from '@/components/Bi';
 import { ChevronRightIcon, ClockIcon } from '@/components/icons';
 import { PulseDot } from '@/components/ScheduleList';
 import { apiCall } from '@/lib/client';
@@ -30,9 +31,19 @@ export function HomeNow() {
       </span>
       <span className="min-w-0 flex-1">
         <span className={`block text-xs font-semibold tracking-wide uppercase ${live ? 'text-success' : 'text-muted'}`}>
-          {live ? (item.status === 'starting' ? 'Starting now' : 'Happening now') : `Up next · ${item.start}`}
+          {live ? (
+            item.status === 'starting' ? (
+              <Bi en="Starting now" ta="startingNow" />
+            ) : (
+              <Bi en="Happening now" ta="happeningNow" />
+            )
+          ) : (
+            <>
+              <Bi en="Up next" ta="upNext" /> · {item.start}
+            </>
+          )}
         </span>
-        <span className="block truncate font-semibold">{item.title}</span>
+        <span className="line-clamp-2 font-semibold">{item.title}</span>
         {now.length > 1 && <span className="block text-xs text-muted">and {now.length - 1} more</span>}
       </span>
       <ChevronRightIcon className="h-5 w-5 shrink-0 text-muted transition group-hover:translate-x-0.5" />

@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { Bi } from '@/components/Bi';
 import { EventName } from '@/components/EventName';
 import { BrandMark, CalendarIcon, LayoutIcon, MapPinIcon } from '@/components/icons';
 import { PulseDot, ScheduleBoard } from '@/components/ScheduleList';
 import { apiCall } from '@/lib/client';
 import { timeOf } from '@/lib/registrations';
-import type { ScheduledItem } from '@/lib/schedule';
+import { isActive, type ScheduledItem } from '@/lib/schedule';
 import { useLiveRefresh } from '@/lib/useLiveRefresh';
 
 /** How often guests' phones pick up status changes. */
@@ -53,14 +54,20 @@ export function ScheduleView({ event, initialItems, initialError, initialUpdated
             <h1 className="text-[15px] leading-tight font-semibold">
               <EventName name={event.name} />
             </h1>
-            <p className="text-xs text-muted">Programme</p>
+            <p className="text-xs text-muted">
+              <Bi en="Programme" ta="programme" />
+            </p>
           </div>
+          {/* "Live" only while something is on, so it never suggests the event has started when it hasn't
+              (the update time is at the foot of the page, which leaves the event name room in the header) */}
           {offline ? (
             <span className="pill shrink-0 bg-warning-soft text-warning">Offline</span>
           ) : (
-            <span className="pill shrink-0 bg-success-soft text-success" title={`Updated ${timeOf(updatedAt)}`}>
-              <PulseDot className="bg-success" /> Live
-            </span>
+            items.some(isActive) && (
+              <span className="pill shrink-0 bg-success-soft text-success" title={`Updated ${timeOf(updatedAt)}`}>
+                <PulseDot className="bg-success" /> Live
+              </span>
+            )
           )}
           {canManage && (
             <a href="/admin/schedule" className="btn btn-ghost h-11 w-11 shrink-0 p-0" aria-label="Manage programme" title="Manage programme">

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { plainEventName } from '@/components/EventName';
 import { SponsorTicker } from '@/components/SponsorTicker';
 import { EVENT } from '@/config/event';
-import { sponsorThanks } from '@/config/sponsors';
+import { SPONSOR_THANKS_SHORT, sponsorThanks } from '@/config/sponsors';
 import { loadSponsors } from '@/lib/sponsors';
 import './globals.css';
 
@@ -28,7 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en-GB">
       <body className="min-h-dvh font-sans antialiased">
         {children}
-        {tiers.length > 0 && <SponsorTicker tiers={tiers} thanks={sponsorThanks(plainEventName(EVENT.name))} />}
+        {tiers.length > 0 && (
+          <SponsorTicker tiers={tiers} thanks={sponsorThanks(plainEventName(EVENT.name))} thanksShort={SPONSOR_THANKS_SHORT} />
+        )}
       </body>
     </html>
   );

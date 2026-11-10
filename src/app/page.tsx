@@ -1,18 +1,26 @@
 import type { Metadata } from 'next';
+import { Bi } from '@/components/Bi';
 import { Diya, plainEventName } from '@/components/EventName';
-import { CalendarIcon, ChevronRightIcon, MapPinIcon } from '@/components/icons';
+import { CalendarIcon, ChevronRightIcon, MapPinIcon, NavigationIcon } from '@/components/icons';
+import { SponsorSpotlight } from '@/components/SponsorSpotlight';
 import { EVENT } from '@/config/event';
+import { loadSponsors } from '@/lib/sponsors';
 import { HomeNow } from './HomeNow';
 
 export const metadata: Metadata = { title: { absolute: EVENT.name } };
 
+/** Opens the venue in the phone's maps app, with directions from where the guest is. */
+const directionsUrl = (venue: string) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(venue)}`;
+
 /**
- * The guest home page: the event, what's on now and the programme (the
- * sponsors roll along the bottom, as on every page). Signed-in volunteers and
- * organisers are sent to the desk instead (middleware), so their phones keep
- * opening straight into check-in.
+ * The guest home page: the event and directions, what's on now, the programme,
+ * and the Platinum and Gold sponsors (all the sponsors also roll along the
+ * bottom). Signed-in volunteers and organisers are sent to the desk instead
+ * (middleware), so their phones keep opening straight into check-in.
  */
 export default function Home() {
+  const topSponsors = loadSponsors().filter(({ tier, sponsors }) => (tier.key === 'platinum' || tier.key === 'gold') && sponsors.length > 0);
+
   return (
     <main className="relative mx-auto max-w-lg px-4 pt-[env(safe-area-inset-top)] pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
       <div
@@ -39,6 +47,12 @@ export default function Home() {
             )}
           </p>
         )}
+        {EVENT.venue && (
+          <a href={directionsUrl(EVENT.venue)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary mt-4 min-h-11 rounded-full px-5">
+            <NavigationIcon className="h-4 w-4" />
+            Get directions
+          </a>
+        )}
       </section>
 
       <div className="relative space-y-3">
@@ -46,12 +60,14 @@ export default function Home() {
 
         <HomeLink
           href="/schedule"
-          title="Programme"
+          title={<Bi en="Programme" ta="programme" stack />}
           text="What’s on now and next, updated live"
           icon={<CalendarIcon className="h-6 w-6" />}
           tileClass="bg-gradient-to-br from-brand to-brand-strong text-on-brand"
         />
       </div>
+
+      <SponsorSpotlight tiers={topSponsors} />
 
       <footer className="relative mt-12 border-t border-line pt-5 text-center text-sm text-muted">
         Volunteer or organiser?{' '}
@@ -71,7 +87,7 @@ function HomeLink({
   tileClass = '',
 }: {
   href: string;
-  title: string;
+  title: React.ReactNode;
   text: string;
   icon: React.ReactNode;
   tileClass?: string;

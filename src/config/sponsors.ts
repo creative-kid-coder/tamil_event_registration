@@ -5,6 +5,9 @@
 export const sponsorThanks = (eventName: string) =>
   `${eventName} இனிதே நடைபெற ஆதரவளித்த அனைத்து ஸ்பான்சர்களுக்கும் எங்களது நன்றிகள்!`;
 
+/** The one-line version the ticker shrinks to while someone scrolls on a phone ("Our thanks to the sponsors!"). */
+export const SPONSOR_THANKS_SHORT = 'ஸ்பான்சர்களுக்கு எங்களது நன்றிகள்!';
+
 /**
  * Sponsor tiers, in the order shown. Each has a folder of logos or flyers under
  * public/sponsors/<folder>/ — drop an image in and it appears in the ticker.

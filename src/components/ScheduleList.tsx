@@ -1,5 +1,6 @@
 import { timeOf } from '@/lib/registrations';
 import { groupSchedule, timeRange, type ScheduledItem, type ScheduleKind } from '@/lib/schedule';
+import { Bi } from './Bi';
 import {
   CheckCircleIcon,
   CheckIcon,
@@ -42,13 +43,13 @@ export function StatusPill({ item }: { item: Pick<ScheduledItem, 'status' | 'sta
     case 'starting':
       return (
         <span className="pill bg-warning-soft text-warning">
-          <PulseDot className="bg-warning" /> Starting now
+          <PulseDot className="bg-warning" /> <Bi en="Starting now" ta="startingNow" />
         </span>
       );
     case 'live':
       return (
         <span className="pill bg-success-soft text-success">
-          <PulseDot className="bg-success" /> Happening now
+          <PulseDot className="bg-success" /> <Bi en="Happening now" ta="happeningNow" />
         </span>
       );
     case 'done':
@@ -126,7 +127,7 @@ export function ScheduleBoard({
           <EmptyState icon={<CheckCircleIcon className="h-6 w-6" />} title="That's a wrap" text="Thank you for coming. See you next time!" />
         ) : (
           started && (
-            <Section title="Now" count={now.length}>
+            <Section title={<Bi en="Now" ta="now" />} count={now.length}>
               {now.length ? (
                 <div className="space-y-3">
                   {now.map((item) => (
@@ -143,7 +144,7 @@ export function ScheduleBoard({
         )}
 
         {next.length > 0 && (
-          <Section title={started ? 'Up next' : 'First up'}>
+          <Section title={started ? <Bi en="Up next" ta="upNext" /> : <Bi en="First up" ta="firstUp" />}>
             <div className="space-y-3">
               {next.map((item) => (
                 <NextCard key={item.id} item={item}>
@@ -157,7 +158,7 @@ export function ScheduleBoard({
 
       <div className="min-w-0 space-y-7">
         {later.length > 0 && (
-          <Section title="Later" count={later.length}>
+          <Section title={<Bi en="Later" ta="later" />} count={later.length}>
             <ul className="card divide-y divide-line overflow-hidden">
               {later.map((item) => (
                 <Row key={item.id} item={item} onOpen={manage?.open} />
@@ -170,7 +171,9 @@ export function ScheduleBoard({
           <details className="group card overflow-hidden" open={finished || undefined}>
             <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
               <CheckIcon className="h-4 w-4 text-muted" />
-              <span className="flex-1 font-semibold">Finished</span>
+              <span className="flex-1 font-semibold">
+                <Bi en="Finished" ta="finished" />
+              </span>
               <span className="pill bg-surface-2 text-muted">{earlier.length}</span>
               <ChevronRightIcon className="h-4 w-4 text-muted transition group-open:rotate-90" />
             </summary>
@@ -188,7 +191,7 @@ export function ScheduleBoard({
   );
 }
 
-function Section({ title, count, children }: { title: string; count?: number; children: React.ReactNode }) {
+function Section({ title, count, children }: { title: React.ReactNode; count?: number; children: React.ReactNode }) {
   return (
     <section>
       <h2 className="mb-2.5 flex items-center gap-2 px-1 text-sm font-semibold text-muted">
@@ -251,7 +254,7 @@ function NextCard({ item, children }: { item: ScheduledItem; children?: React.Re
         <div className="min-w-0 flex-1 self-center">
           <h3 className="text-[17px] leading-snug font-semibold">{item.title}</h3>
           <Details item={item} className="mt-1" />
-          {item.description && <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">{item.description}</p>}
+          {item.description && <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-muted">{item.description}</p>}
           <Note note={item.note} />
         </div>
       </div>
@@ -270,7 +273,8 @@ function Row({ item, onOpen }: { item: ScheduledItem; onOpen?: (item: ScheduledI
     <>
       <span className={`w-12 shrink-0 text-[15px] font-semibold tabular-nums ${done || cancelled ? 'text-muted' : ''}`}>{item.start}</span>
       <span className="min-w-0 flex-1">
-        <span className={`block truncate text-[15px] font-medium ${cancelled ? 'text-muted line-through' : done ? 'text-muted' : ''}`}>
+        {/* Up to two lines, so titles aren't cut off on a phone */}
+        <span className={`line-clamp-2 text-[15px] leading-snug font-medium ${cancelled ? 'text-muted line-through' : done ? 'text-muted' : ''}`}>
           {item.title}
         </span>
         <span className="block truncate text-xs text-muted">
@@ -278,7 +282,8 @@ function Row({ item, onOpen }: { item: ScheduledItem; onOpen?: (item: ScheduledI
         </span>
         {item.note && !done && <span className="mt-1 block text-xs font-medium text-brand">{item.note}</span>}
       </span>
-      {!done && (
+      {/* Icons only where they tell guests something: food, games, kids. Most of the day is stage items. */}
+      {!done && item.kind !== 'stage' && (
         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-2 ${cancelled ? 'text-danger' : 'text-muted'}`}>
           <KindIcon kind={item.kind} />
         </span>

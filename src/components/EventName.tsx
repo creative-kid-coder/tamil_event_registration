@@ -57,7 +57,8 @@ export function Diya({ className = '' }: { className?: string }) {
 
 /**
  * `wrap`: a title that may run onto more lines; the lamp starts the first line.
- * Otherwise it stays on one line and is cut off with "…" (headers).
+ * Otherwise (headers) the lamp sits beside the name, which runs onto a second
+ * line on a narrow phone and is only cut off with "…" beyond that.
  */
 export function EventName({ name, className = '', wrap = false }: { name: string; className?: string; wrap?: boolean }) {
   const match = LEADING_EMOJI.exec(name);
@@ -85,7 +86,7 @@ export function EventName({ name, className = '', wrap = false }: { name: string
       ) : (
         emoji && <span className="shrink-0 text-[1.4em] leading-none">{emoji}</span>
       )}
-      <span className={`min-w-0 ${wrap ? '' : 'truncate'}`}>{text}</span>
+      <span className="line-clamp-2 min-w-0">{text}</span>
     </span>
   );
 }

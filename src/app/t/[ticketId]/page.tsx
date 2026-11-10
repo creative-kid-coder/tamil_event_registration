@@ -1,5 +1,6 @@
 import QRCode from 'qrcode';
 import { BadgeGrid } from '@/components/BadgeGrid';
+import { Bi } from '@/components/Bi';
 import { EventName } from '@/components/EventName';
 import { BrandMark, CalendarIcon, CheckCircleIcon } from '@/components/icons';
 import { EVENT, ticketUrl } from '@/config/event';
@@ -85,7 +86,9 @@ export default async function TicketPage({ params }: { params: Promise<{ ticketI
 
       <a href="/schedule" className="btn btn-secondary mt-4 w-full py-3">
         <CalendarIcon className="h-4 w-4" />
-        View the programme
+        <span>
+          <Bi en="View the programme" ta="programme" />
+        </span>
       </a>
     </main>
   );

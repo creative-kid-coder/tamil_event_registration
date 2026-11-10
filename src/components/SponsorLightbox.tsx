@@ -3,18 +3,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { SponsorTier } from '@/config/sponsors';
 import type { Sponsor } from '@/lib/sponsors';
-import { AwardIcon, ChevronRightIcon, ExternalIcon, GemIcon, HeartIcon, MedalIcon, StarIcon, XIcon, ZoomInIcon } from './icons';
+import { AwardIcon, ChevronRightIcon, ExternalIcon, XIcon, ZoomInIcon } from './icons';
+import { TIER_ICON } from './TierBadge';
 
 /** A sponsor along with the tier it's in. */
 export type ShownSponsor = Sponsor & { tier: SponsorTier };
-
-export const TIER_ICON: Record<string, (p: { className?: string }) => React.ReactNode> = {
-  platinum: GemIcon,
-  gold: StarIcon,
-  silver: MedalIcon,
-  associate: AwardIcon,
-  community: HeartIcon,
-};
 
 function Medal({ tier, className = 'h-11 w-11', iconClass = 'h-5 w-5' }: { tier: SponsorTier; className?: string; iconClass?: string }) {
   const Icon = TIER_ICON[tier.key] ?? AwardIcon;

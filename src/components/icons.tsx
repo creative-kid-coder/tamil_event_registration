@@ -127,6 +127,25 @@ export const PauseIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const NavigationIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 11 21 3l-8 18-2-8-8-2Z" />
+  </Icon>
+);
+
+export const MaximizeIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+  </Icon>
+);
+
+export const MonitorIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M8 20h8M12 16v4" />
+  </Icon>
+);
+
 export const PlayIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M7 4.5v15a.5.5 0 0 0 .77.42l11.5-7.5a.5.5 0 0 0 0-.84L7.77 4.08A.5.5 0 0 0 7 4.5Z" />

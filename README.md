@@ -2,7 +2,8 @@
 
 Check-in for an event whose registrations came from a Google Form. Volunteers scan a guest's QR code (or search by name / mobile), hand over the coloured food badges shown, and tap **Check in**. If the same party turns up at another desk, that desk sees **"ALREADY CHECKED IN at 18:42 by Desk 2"**.
 
-- **Home** (`/`): for guests, with the event, what's on now, and a button to the programme, plus a small "Staff sign-in" link. Signed-in volunteers and organisers go straight to the desk instead.
+- **Home** (`/`): for guests, with the event and a **Get directions** button (opens the venue in the phone's maps app), what's on now, the programme, and the Platinum and Gold sponsors, plus a small "Staff sign-in" link. Signed-in volunteers and organisers go straight to the desk instead.
+- **Projector screen** (`/screen`): for the hall's projector or TV (see [Projector screen](#projector-screen)).
 - **Desk** (`/desk`): QR scan, instant search, badge counts per category, check-in, undo.
 - **Admin** (`/admin`): arrivals, badges handed out against expected, recent check-ins, not yet arrived, data issues, QR emails (sent from your Gmail), CSV export.
 - **Guest page** (`/t/<ticket>`): first name and booking counts only.
@@ -181,7 +182,7 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
   - `place`
   - `forWho`
   - `description`
-  - `kind`: one of `stage`, `food`, `game`, `kids` or `other`. It only sets the icon.
+  - `kind`: one of `stage`, `food`, `game`, `kids` or `other`. It only sets the icon guests see next to the item (none for `stage`, as most of the day is stage items).
 - **Keep each `id` the same once the day starts**, because statuses are saved against it.
 - **If an edit breaks the file**, the admin page shows what's wrong and guests keep seeing the last good version.
 
@@ -193,15 +194,28 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
 - **Anything else:** tap any item, or **⋯**, to open its panel. From there you can choose any status (including **Cancelled** or back to **Upcoming**) and add or remove a note for guests (e.g. "Moved to Hall B").
 - **Mistakes:** after each change, a message at the bottom offers **Undo** for a few seconds.
 - **Share with guests:** shows a QR code and link to `/schedule` for the projector or posters. Open the admin page through the **tunnel address** (not `localhost`) so the QR works on guests' phones. The quick-tunnel address changes each time you start it, so print posters only after starting the tunnel for the day. The ticket page also links to the programme.
+- **What guests see:** a green **Live** badge in the header only while something is on. The key labels have Tamil alongside, e.g. "Up next · அடுத்து". Change the Tamil wording in `src/config/labels.ts`; an empty string there shows the English on its own.
+
+## Projector screen
+
+Open **`/screen`** on the laptop connected to the hall's projector or TV and press **Full screen**. It's also linked from the admin **Programme** page, under **Share with guests**. Everything on it updates by itself:
+- **Left:** what's on now in large type, with your note for guests, or, between items, what's next and when. Below it, the next few items.
+- **Right:** your sponsors take turns, one at a time and large, about 8 seconds each. In each full cycle, a Platinum sponsor gets three turns, a Gold sponsor two, and everyone else one, spaced out so no one appears twice in a row.
+- **Along the bottom:** the Tamil thank-you to the sponsors, and a QR code guests can scan from their seats for the live programme.
+- **Clock:** top right. The screen also asks the laptop not to dim or sleep while it's open.
+
+It needs no sign-in and shows no personal details. Open it through the **tunnel address** (not `localhost`) so the QR works on guests' phones.
 
 ---
 
 ## Sponsor ticker
 
-Your sponsors drift along a light bar fixed to the bottom of every page, for guests and staff alike.
-- **Heading:** the full 🪔 Tamil thank-you sits above the row, always shown in full. It's one line on a laptop and wraps onto more on a phone. Pages leave exactly enough room for the bar, however tall it is.
-- **The row:** grouped by tier, Platinum first. Each tier's coloured badge is followed by its sponsor images, all the same height, with a thin divider before the next tier. The row loops slowly and fades out at both ends.
-- **Best images:** logos with a transparent background, ideally wider than tall, look best. Portrait flyers work but show small, so people tap them to read them.
+Your sponsors drift along a light bar fixed to the bottom of the guest pages (home, programme, ticket) and the sign-in page. It isn't on the Desk or Admin pages, where staff need the whole screen and nothing moving.
+- **Heading:** the full 🪔 Tamil thank-you sits above the row. It's one line on a laptop and wraps onto more on a phone. There, it shrinks to one line ("ஸ்பான்சர்களுக்கு எங்களது நன்றிகள்!", `SPONSOR_THANKS_SHORT` in `src/config/sponsors.ts`) while a guest scrolls, and comes back in full at the top and end of the page. Pages leave room for the bar, so it never covers the end of a page.
+- **The row:** grouped by tier, Platinum first. Each tier's coloured badge is followed by its sponsors, with a thin divider before the next tier. Every sponsor gets the same white tile whatever the shape of their image, so a portrait flyer counts as much as a wide logo. Tiles are larger for higher tiers. The row loops slowly and fades out at both ends.
+- **Home page:** the Platinum and Gold sponsors also get their own section on the home page: Platinum large, Gold three to a row, each with its name.
+- **Projector:** the sponsors take turns on the [projector screen](#projector-screen) too, Platinum most often.
+- **Best images:** logos, ideally wider than tall, look sharpest. Portrait flyers work but show small in the bar, so people tap them to read them.
 - **Enlarged view:** tapping a sponsor opens their image large. Close it with the ✕ at the top, by tapping outside, or with Esc. Tap the image to zoom in on a flyer's small print, and again to fit it back to the screen. Use ‹ ›, swipe, or the arrow keys to move between sponsors.
 - **Pausing:** the row stops while someone hovers over the images or has a sponsor open, and its ⏸ button pauses it.
 - **Reduce motion:** on devices with "reduce motion" turned on, it stands still and can be swiped sideways instead.
