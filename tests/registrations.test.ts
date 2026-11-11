@@ -4,7 +4,7 @@ import { mapHeaders, normalizeHeader } from '@/config/columns';
 import { parseCsv } from '@/lib/csv';
 import { findByTicket, loadFromText, ticketIdFor } from '@/lib/data';
 import { normalizeTicketId, ticketIdFromScan } from '@/lib/ids';
-import { emptyCounts, matchesQuery, normalizeMeal, normalizeMobile, parseCount, parseRegistrations } from '@/lib/registrations';
+import { emptyCounts, isMeaningful, matchesQuery, normalizeMeal, normalizeMobile, parseCount, parseRegistrations, partyMix } from '@/lib/registrations';
 
 /** Exact headers from the Google Form responses sheet. */
 const FORM_HEADERS = [
@@ -272,5 +272,18 @@ describe('search', () => {
 
   it.each(['', 'john', '9999', 'priya smith'])('does not match %j', (q) => {
     expect(matchesQuery(withTicket, q)).toBe(false);
+  });
+});
+
+describe('not registered yet list', () => {
+  it('describes a party by age group, singular and plural', () => {
+    expect(partyMix({ ...emptyCounts(), adultVeg: 1, adultNonVeg: 1, juniorVeg: 1, kids: 2 })).toBe('2 adults, 1 junior, 2 kids');
+    expect(partyMix({ ...emptyCounts(), adultNonVeg: 1, yaVeg: 1, yaNonVeg: 1 })).toBe('1 adult, 2 young adults');
+    expect(partyMix(emptyCounts())).toBe('');
+  });
+
+  it('treats blank and "No"-style answers as not taking part', () => {
+    for (const answer of ['', 'No', 'none', 'N/A', '-']) expect(isMeaningful(answer)).toBe(false);
+    for (const answer of ['Yes', 'Food Serving']) expect(isMeaningful(answer)).toBe(true);
   });
 });

@@ -65,7 +65,14 @@ export default function DeskPage() {
   }, []);
 
   useEffect(() => {
-    load();
+    load().then((list) => {
+      // Opened from the "Not registered yet" list (/desk?ticket=…): show that party, ready to check in.
+      const wanted = new URLSearchParams(window.location.search).get('ticket');
+      if (!wanted) return;
+      window.history.replaceState(null, '', window.location.pathname);
+      if (list?.some((p) => p.ticketId === wanted)) setSelectedId(wanted);
+      else if (list) setBanner({ kind: 'error', text: 'That booking is no longer in the registrations. Search by name or mobile instead.' });
+    });
     const timer = setInterval(load, POLL_MS);
     window.addEventListener('focus', load);
     return () => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { BADGES } from '@/config/badges';
-import { fullName, timeOf, type Party } from '@/lib/registrations';
+import { fullName, isMeaningful, timeOf, type Party } from '@/lib/registrations';
 import { Avatar } from './Avatar';
 import { BadgeGrid } from './BadgeGrid';
 import { AlertIcon, ArrowLeftIcon, CheckIcon, MailIcon, PhoneIcon, UndoIcon, UsersIcon } from './icons';
@@ -13,8 +13,6 @@ interface Props {
   onUndo: () => void;
   onClose: () => void;
 }
-
-const isMeaningful = (v: string) => v && !/^(no|none|n\/a|-)$/i.test(v);
 
 export function PartyCard({ party, busy, onCheckIn, onUndo, onClose }: Props) {
   const { checkIn } = party;

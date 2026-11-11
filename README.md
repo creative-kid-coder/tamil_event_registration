@@ -161,6 +161,13 @@ Emails come **from your Gmail address**, shown with the event name, and replies 
 
 **Undo check-in** is only for mistakes, e.g. the wrong party was tapped. Every check-in and undo is also written to an audit log in the database.
 
+**Who hasn't come yet:** on Admin, tap **Not registered yet** (or open `/admin/not-registered`). It lists every family that hasn't checked in at the desk, with how many people are in each family. A family leaves the list as soon as a desk checks them in, and the page refreshes every 15 seconds.
+- Search by name, email or mobile; sort by surname or largest party first.
+- **Performing** and **Volunteering** show only the families who said so on the form. Use them to chase performers before their slot.
+- **Call** phones the family. **Check in** opens the desk with that family's card ready; badges are still handed over and confirmed there.
+- **Download (CSV)** saves just this list, e.g. to share out phone calls.
+- The list holds names and mobile numbers, so it needs the **admin PIN**.
+
 **After the event:** download the CSV from Admin; it includes "Checked In At" and "Checked In By". Keep or delete `data/checkin.db` as you see fit.
 
 ---
@@ -279,7 +286,7 @@ src/
   lib/auth.ts             PIN sign-in, session cookie
   lib/mailer.ts           QR email via Gmail (SMTP + app password)
   middleware.ts           protects /desk, /admin and the APIs
-  app/…                   pages (login, desk, admin, admin/schedule, schedule, t/[ticketId]) and API routes
+  app/…                   pages (login, desk, admin, admin/schedule, admin/not-registered, schedule, t/[ticketId]) and API routes
   app/demo/               the demo animation (Motion), off unless ENABLE_DEMO=1
 scripts/render-demo.mjs   renders the demo to demo/how-it-works.mp4
 tests/                    unit tests + made-up fixture data

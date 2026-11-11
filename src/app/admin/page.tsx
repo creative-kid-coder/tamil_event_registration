@@ -79,6 +79,30 @@ function ProgrammeBar({ items }: { items: ScheduledItem[] }) {
   );
 }
 
+/** One line: how many families haven't checked in yet, linking to the full list. */
+function NotRegisteredBar({ families, people }: { families: number; people: number }) {
+  return (
+    <a href="/admin/not-registered" className="card flex items-center gap-3 px-4 py-3 text-sm transition hover:bg-surface-2">
+      <UsersIcon className="h-5 w-5 shrink-0 text-muted" />
+      <span className="min-w-0 flex-1 truncate">
+        {families > 0 ? (
+          <>
+            <span className="font-semibold">Not registered yet:</span> {families} {families === 1 ? 'family' : 'families'}
+            <span className="text-muted">
+              {' '}
+              · {people} {people === 1 ? 'person' : 'people'}
+            </span>
+          </>
+        ) : (
+          <span className="font-semibold text-success">Every family has registered</span>
+        )}
+      </span>
+      <span className="hidden shrink-0 font-medium text-brand sm:inline">View list</span>
+      <ChevronRightIcon className="h-4 w-4 shrink-0 text-muted" />
+    </a>
+  );
+}
+
 export default function AdminPage() {
   const [regs, setRegs] = useState<Party[]>([]);
   const [session, setSession] = useState<Session | null>(null);
@@ -138,7 +162,6 @@ export default function AdminPage() {
       given,
       peopleIn: checked.reduce((n, r) => n + r.totalPeople, 0),
       recent: [...checked].sort((a, b) => b.checkIn!.at.localeCompare(a.checkIn!.at)).slice(0, 20),
-      notArrived: regs.filter((r) => !r.checkIn).sort((a, b) => a.surname.localeCompare(b.surname)),
       people: regs.reduce((n, r) => n + r.totalPeople, 0),
       issues: regs.filter((r) => r.warnings.length),
       withEmail: regs.filter((r) => r.email).length,
@@ -279,7 +302,10 @@ export default function AdminPage() {
           </p>
         )}
 
-        <ProgrammeBar items={programme} />
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <ProgrammeBar items={programme} />
+          {regs.length > 0 && <NotRegisteredBar families={regs.length - stats.checked.length} people={stats.people - stats.peopleIn} />}
+        </div>
 
         <StatsTiles
           tiles={[
@@ -590,27 +616,6 @@ export default function AdminPage() {
               )}
             </Section>
 
-            <section className="card">
-              <details className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 font-semibold">
-                  <span className="flex items-center gap-2">
-                    <UsersIcon className="h-4 w-4 text-muted" />
-                    Not arrived yet
-                  </span>
-                  <span className="pill bg-surface-2 text-muted">{stats.notArrived.length}</span>
-                </summary>
-                <ul className="max-h-96 divide-y divide-line overflow-y-auto border-t border-line px-5">
-                  {stats.notArrived.map((r) => (
-                    <li key={r.ticketId} className="flex items-center justify-between gap-3 py-2.5 text-sm">
-                      <span className="truncate">
-                        {fullName(r)} <span className="text-muted">· {r.totalPeople}</span>
-                      </span>
-                      <span className="shrink-0 text-muted tabular-nums">{r.mobile}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </section>
           </div>
         </div>
       </main>

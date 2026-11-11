@@ -198,6 +198,26 @@ export function fullName(r: Pick<Registration, 'firstName' | 'surname'>): string
   return `${r.firstName} ${r.surname}`.trim();
 }
 
+const AGE_GROUPS: [one: string, many: string, keys: BadgeKey[]][] = [
+  ['adult', 'adults', ['adultVeg', 'adultNonVeg']],
+  ['young adult', 'young adults', ['yaVeg', 'yaNonVeg']],
+  ['junior', 'juniors', ['juniorVeg', 'juniorNonVeg']],
+  ['kid', 'kids', ['kids']],
+];
+
+/** Who is in a party, by age group: "2 adults, 1 junior, 1 kid". */
+export function partyMix(badges: BadgeCounts): string {
+  return AGE_GROUPS.map(([one, many, keys]) => {
+    const n = keys.reduce((sum, key) => sum + badges[key], 0);
+    return n ? `${n} ${n === 1 ? one : many}` : '';
+  })
+    .filter(Boolean)
+    .join(', ');
+}
+
+/** True for a real form answer, false for blanks and "No" / "None" / "N/A" / "-". */
+export const isMeaningful = (value: string) => Boolean(value) && !/^(no|none|n\/a|-)$/i.test(value);
+
 export function matchesQuery(r: Registration, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return false;

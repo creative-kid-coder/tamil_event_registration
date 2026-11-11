@@ -1,3 +1,4 @@
+import type { NextRequest } from 'next/server';
 import { BADGES } from '@/config/badges';
 import { errorResponse } from '@/lib/api';
 import { getParties } from '@/lib/data';
@@ -17,8 +18,10 @@ const ukDateTime = (iso: string) =>
 /**
  * Badge list (one row per party, sorted by surname) with check-in status —
  * the printable backup for the desks and a copy of the check-in record.
+ * `?only=waiting` lists just the parties that haven't checked in yet.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const waitingOnly = req.nextUrl.searchParams.get('only') === 'waiting';
   try {
     const header = [
       'Ticket ID', 'First Name', 'Surname', 'Mobile', 'Email', 'Adult 1 Meal',
@@ -26,6 +29,7 @@ export async function GET() {
       'Total People', 'Volunteering', 'Cultural Program', 'Checked In At', 'Checked In By', 'Warnings',
     ];
     const rows = (await getParties())
+      .filter((r) => !waitingOnly || !r.checkIn)
       .sort((a, b) => a.surname.localeCompare(b.surname) || a.firstName.localeCompare(b.firstName))
       .map((r) => [
         r.ticketId, r.firstName, r.surname, r.mobile, r.email, r.adult1MealRaw,
@@ -38,7 +42,7 @@ export async function GET() {
     return new Response('﻿' + csv, {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="badge-list.csv"',
+        'Content-Disposition': `attachment; filename="${waitingOnly ? 'not-registered-yet' : 'badge-list'}.csv"`,
       },
     });
   } catch (error) {
