@@ -4,9 +4,9 @@ import type { Session } from '@/lib/auth';
 import { logout } from '@/lib/client';
 import { Avatar } from './Avatar';
 import { EventName } from './EventName';
-import { BrandMark, CalendarIcon, LayoutIcon, LogOutIcon, ScanIcon } from './icons';
+import { BrandMark, CalendarIcon, LayoutIcon, LogOutIcon, ScanIcon, UtensilsIcon } from './icons';
 
-type Tab = 'desk' | 'admin' | 'schedule';
+type Tab = 'desk' | 'admin' | 'schedule' | 'dinner';
 
 interface Props {
   session: Session | null;
@@ -18,9 +18,10 @@ const TABS: { key: Tab; href: string; label: string; Icon: (p: { className?: str
   { key: 'desk', href: '/desk', label: 'Desk', Icon: ScanIcon },
   { key: 'admin', href: '/admin', label: 'Admin', Icon: LayoutIcon },
   { key: 'schedule', href: '/admin/schedule', label: 'Programme', Icon: CalendarIcon },
+  { key: 'dinner', href: '/admin/dinner', label: 'Dinner', Icon: UtensilsIcon },
 ];
 
-/** Sticky top bar shared by the staff pages (desk, admin, programme). */
+/** Sticky top bar shared by the staff pages (desk, admin, programme, dinner). Only admins see the tabs. */
 export function AppHeader({ session, eventName, active }: Props) {
   const showTabs = session?.role === 'admin';
 
@@ -66,10 +67,10 @@ export function AppHeader({ session, eventName, active }: Props) {
         )}
       </div>
 
-      {/* Phones: three equal tabs, icon above label, so they fit even on the smallest screens. */}
+      {/* Phones: four equal tabs, icon above label, so they fit even on the smallest screens. */}
       {showTabs && (
         <nav className="mx-auto max-w-6xl px-4 pb-2 sm:hidden">
-          <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1">
+          <div className="grid grid-cols-4 gap-1 rounded-xl bg-surface-2 p-1">
             {TABS.map(({ key, href, label, Icon }) => (
               <a
                 key={key}

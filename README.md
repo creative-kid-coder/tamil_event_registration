@@ -204,6 +204,18 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
 - **Share with guests:** shows a QR code and link to `/schedule` for the projector or posters. Open the admin page through the **tunnel address** (not `localhost`) so the QR works on guests' phones. The quick-tunnel address changes each time you start it, so print posters only after starting the tunnel for the day. The ticket page also links to the programme.
 - **What guests see:** a green **Live** badge in the header only while something is on. The key labels have Tamil alongside, e.g. "Up next · அடுத்து". Change the Tamil wording in `src/config/labels.ts`; an empty string there shows the English on its own.
 
+## Dinner boxes
+
+Admins get a **Dinner** tab (desk volunteers don't see it). It counts the dinner boxes for each family and lets you tick families off as their boxes are handed over, the same way the desk checks families in.
+
+**Load the packing list:** on the Dinner tab, tap **Upload dinner CSV** (later, **Replace CSV**). On the laptop it's saved as `data/dinner.csv`; on Vercel, privately in Vercel Blob. Like the responses, it holds names, so it's never committed to git.
+- **Columns, found by header name:** `S.No`, `Name`, `Adults`, `Young adults (11–16)`, `Juniors (6–10)`, `Under 5 (no dinner)` and `Total`. Name, Adults, Young adults and Juniors are required.
+- **Boxes per family = adults + young adults + juniors.** Under 5s don't get a box. The sheet's `Total` is only used to flag rows that don't add up (a Total that also counts the under 5s is fine).
+- **Ignored:** the totals line at the bottom (it has no name) and the sheet's own "Packed / handed over ✓" column. Tick in the app instead.
+- **Uploading again keeps the ticks** for every family whose name is unchanged. Ticks are matched by name, so renaming a family in the sheet clears its tick.
+
+**On the day:** search by name or S.No and tap **Handed over**. The banner has an **Undo** in case of a wrong tap. If someone else already ticked that family, it says who and when, so boxes aren't given twice. The **Handed over** filter shows who has had theirs; the summary shows the boxes still to hand over by type. The page refreshes every 10 seconds, and every tick and undo is kept in an audit log.
+
 ## Projector screen
 
 Open **`/screen`** on the laptop connected to the hall's projector or TV and press **Full screen**. It's also linked from the admin **Programme** page, under **Share with guests**. Everything on it updates by itself:
@@ -272,6 +284,7 @@ An 88-second animation of how the app works, built with [Motion](https://motion.
 ```
 data/responses.csv        your form export (you add this)
 data/schedule.json        programme running order (you edit this)
+data/dinner.csv           dinner packing list (uploaded on the Dinner tab; not in git)
 data/checkin.db           check-ins + programme statuses (created automatically, built-in SQLite)
 src/
   config/columns.ts       header → field mapping (by name)
@@ -284,10 +297,12 @@ src/
   lib/checkins.ts         check-in store (SQLite, atomic, audit log)
   lib/schedule.ts         programme parsing, now/next (pure, unit-tested)
   lib/scheduleStore.ts    loads schedule.json (reloads when it changes), programme statuses
+  lib/dinner.ts           dinner CSV parsing and box counts (pure, unit-tested)
+  lib/dinnerStore.ts      loads dinner.csv, handed-over ticks (SQLite or Blob)
   lib/auth.ts             PIN sign-in, session cookie
   lib/mailer.ts           QR email via Gmail (SMTP + app password)
   middleware.ts           protects /desk, /admin and the APIs
-  app/…                   pages (login, desk, admin, admin/schedule, admin/not-registered, schedule, t/[ticketId]) and API routes
+  app/…                   pages (login, desk, admin, admin/schedule, admin/not-registered, admin/dinner, schedule, t/[ticketId]) and API routes
   app/demo/               the demo animation (Motion), off unless ENABLE_DEMO=1
 scripts/render-demo.mjs   renders the demo to demo/how-it-works.mp4
 tests/                    unit tests + made-up fixture data

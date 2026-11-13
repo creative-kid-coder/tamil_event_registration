@@ -51,6 +51,20 @@ export function getDb(): Database {
       at      TEXT NOT NULL,
       by      TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS dinner_handovers (
+      family_key TEXT PRIMARY KEY,
+      at         TEXT NOT NULL,
+      by         TEXT NOT NULL,
+      boxes      INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS dinner_log (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      family_key TEXT NOT NULL,
+      action     TEXT NOT NULL CHECK (action IN ('handover', 'undo')),
+      at         TEXT NOT NULL,
+      by         TEXT NOT NULL,
+      boxes      INTEGER
+    );
   `);
   db = conn;
   return conn;
