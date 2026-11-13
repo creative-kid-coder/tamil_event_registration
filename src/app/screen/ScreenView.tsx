@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Bi } from '@/components/Bi';
 import { Diya, plainEventName } from '@/components/EventName';
 import { MapPinIcon, MaximizeIcon } from '@/components/icons';
-import { PulseDot } from '@/components/ScheduleList';
+import { KindIcon, PulseDot } from '@/components/ScheduleList';
 import type { ShownSponsor } from '@/components/SponsorLightbox';
 import { TierBadge } from '@/components/TierBadge';
 import { TA } from '@/config/labels';
@@ -89,7 +89,8 @@ export function ScreenView({ event, initialItems, slides, thanks }: Props) {
 
   const { now, next, later } = groupSchedule(items);
   // Still to come, after the current point (not items that were skipped earlier).
-  const after = later.filter((item) => item.status === 'upcoming' && (!next[0] || item.start >= next[0].start));
+  const from = next[0] ? items.indexOf(next[0]) : -1;
+  const after = later.filter((item) => item.status === 'upcoming' && items.indexOf(item) > from);
   const started = items.some((item) => item.status === 'starting' || item.status === 'live' || item.status === 'done');
   const finished = started && !now.length && !next.length && !after.length;
   const hero = now.length ? null : next[0];
@@ -146,9 +147,14 @@ export function ScreenView({ event, initialItems, slides, thanks }: Props) {
                 {now.length ? <Bi en="Up next" ta="upNext" /> : <Bi en="Later" ta="later" />}
               </h2>
               <ul className="mt-[0.9vw] space-y-[0.7vw]">
-                {list.slice(0, 5).map((item) => (
+                {list.slice(0, 5).map((item, _, shown) => (
                   <li key={item.id} className="flex items-baseline gap-[1.4vw]">
-                    <span className="w-[5.6vw] shrink-0 text-[1.55vw] font-semibold text-amber-300 tabular-nums">{item.start}</span>
+                    {/* A time column only as wide as it needs to be: just the icon when none of these has a time. */}
+                    <span
+                      className={`shrink-0 text-[1.55vw] font-semibold text-amber-300 tabular-nums ${shown.some((i) => i.start) ? 'w-[5.6vw]' : 'w-[1.6vw]'}`}
+                    >
+                      {item.start ?? <KindIcon kind={item.kind} className="inline h-[1.4vw] w-[1.4vw] align-[-0.15em] text-amber-300/70" />}
+                    </span>
                     <span className={`min-w-0 truncate text-[1.6vw] font-medium ${item.status === 'cancelled' ? 'text-white/40 line-through' : ''}`}>
                       {item.title}
                     </span>
@@ -221,7 +227,7 @@ function NextPanel({ item, first }: { item: ScheduledItem; first: boolean }) {
         {first ? <Bi en="First up" ta="firstUp" /> : <Bi en="Up next" ta="upNext" />}
       </span>
       <div className="mt-[0.8vw] flex items-baseline gap-[1.6vw]">
-        <span className="shrink-0 text-[4vw] leading-none font-bold text-amber-300 tabular-nums">{item.start}</span>
+        {item.start && <span className="shrink-0 text-[4vw] leading-none font-bold text-amber-300 tabular-nums">{item.start}</span>}
         <h2 className="line-clamp-2 min-w-0 text-[3vw] leading-[1.15] font-bold tracking-tight">{item.title}</h2>
       </div>
       {item.place && (

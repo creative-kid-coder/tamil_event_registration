@@ -13,8 +13,9 @@ export type ScheduleKind = (typeof KINDS)[number];
 export interface ScheduleItem {
   id: string;
   title: string;
-  /** "HH:MM", event-day local time. */
-  start: string;
+  /** "HH:MM", event-day local time. Optional: items without one (e.g. the performances) show no time. */
+  start?: string;
+  /** Only with a start time. */
   end?: string;
   place?: string;
   description?: string;
@@ -54,28 +55,30 @@ export function parseSchedule(text: string): ScheduleItem[] {
   const seen = new Set<string>();
   const items: ScheduleItem[] = [];
   const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
+  const blank = (v: unknown) => v === undefined || v === null || v === '';
 
   raw.forEach((entry, i) => {
     const e = (entry ?? {}) as Record<string, unknown>;
     const id = str(e.id);
     const title = str(e.title);
     const where = `Item ${i + 1}${title ? ` ("${title}")` : ''}`;
-    const start = normalizeTime(e.start);
-    const end = e.end === undefined || e.end === '' ? undefined : normalizeTime(e.end);
+    const start = blank(e.start) ? undefined : normalizeTime(e.start);
+    const end = blank(e.end) ? undefined : normalizeTime(e.end);
 
     if (!id) problems.push(`${where}: missing "id"`);
     else if (seen.has(id)) problems.push(`${where}: id "${id}" is used twice`);
     if (!title) problems.push(`${where}: missing "title"`);
-    if (!start) problems.push(`${where}: "start" must be a time like 18:30 (got "${e.start ?? ''}")`);
+    if (start === null) problems.push(`${where}: "start" must be a time like 18:30 (got "${e.start}")`);
     if (end === null) problems.push(`${where}: "end" must be a time like 19:15 (got "${e.end}")`);
-    if (!id || !title || !start || end === null || seen.has(id)) return;
+    else if (end && !start) problems.push(`${where}: has an "end" time but no "start" time`);
+    if (!id || !title || start === null || end === null || (end && !start) || seen.has(id)) return;
 
     seen.add(id);
     items.push({
       id,
       title,
-      start,
-      end,
+      start: start ?? undefined,
+      end: end ?? undefined,
       place: str(e.place),
       description: str(e.description),
       forWho: str(e.forWho),
@@ -84,8 +87,8 @@ export function parseSchedule(text: string): ScheduleItem[] {
   });
 
   if (problems.length) throw new Error(problems.join('\n'));
-  // Stable sort: items starting together keep their order in the file.
-  return items.sort((a, b) => a.start.localeCompare(b.start));
+  // The running order is the order in the file, so items without a time (the performances) keep their place.
+  return items;
 }
 
 export const isActive = (item: Pick<ScheduledItem, 'status'>) => item.status === 'starting' || item.status === 'live';
@@ -119,7 +122,9 @@ export function nowAndNext<T extends ScheduledItem>(items: T[]): { now: T[]; nex
     if (isActive(item) || item.status === 'done') lastReached = i;
   });
   const after = items.filter((item, i) => i > lastReached && item.status === 'upcoming');
-  const next = after.length ? after.filter((item) => item.start === after[0].start) : [];
+  // Items that share a start time come up together; an item without a time comes up on its own.
+  const first = after[0];
+  const next = !first ? [] : first.start ? after.filter((item) => item.start === first.start) : [first];
   return { now, next };
 }
 
@@ -143,5 +148,6 @@ export function groupSchedule<T extends ScheduledItem>(items: T[]): { now: T[]; 
   return { now, next, later, earlier };
 }
 
-/** "18:30" or "18:30–19:15". */
-export const timeRange = (item: Pick<ScheduleItem, 'start' | 'end'>) => (item.end ? `${item.start}–${item.end}` : item.start);
+/** "18:30", "18:30–19:15", or "" for an item without a time. */
+export const timeRange = (item: Pick<ScheduleItem, 'start' | 'end'>) =>
+  !item.start ? '' : item.end ? `${item.start}–${item.end}` : item.start;

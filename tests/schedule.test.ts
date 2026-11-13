@@ -3,24 +3,44 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { setBlobClient } from '@/lib/blob';
-import { groupSchedule, nowAndNext, parseSchedule, statusTimes, type ScheduledItem, type ScheduleStatus } from '@/lib/schedule';
+import { groupSchedule, nowAndNext, parseSchedule, statusTimes, timeRange, type ScheduledItem, type ScheduleStatus } from '@/lib/schedule';
 import { memoryBlob } from './memoryBlob';
 
 const items = (list: object[]) => JSON.stringify({ items: list });
 
 describe('parseSchedule', () => {
-  it('sorts by start time, keeping file order for equal times', () => {
+  it('keeps the order of the file, and tidies times and kinds', () => {
     const parsed = parseSchedule(
       items([
-        { id: 'c', title: 'C', start: '19:00' },
         { id: 'a', title: 'A', start: '9:05', end: '10:00', kind: 'stage' },
         { id: 'b1', title: 'B1', start: '17:30' },
         { id: 'b2', title: 'B2', start: '17:30', kind: 'nonsense' },
+        { id: 'c', title: 'C', start: '19:00' },
       ]),
     );
     expect(parsed.map((i) => i.id)).toEqual(['a', 'b1', 'b2', 'c']);
     expect(parsed[0]).toMatchObject({ start: '09:05', end: '10:00', kind: 'stage' });
     expect(parsed[2].kind).toBe('other');
+  });
+
+  it('allows items without a time, in their place in the running order', () => {
+    const parsed = parseSchedule(
+      items([
+        { id: 'welcome', title: 'Welcome', start: '10:45', end: '11:00' },
+        { id: 'perf-01', title: '1. Dance', kind: 'stage' },
+        { id: 'perf-02', title: '2. Song', start: '', end: '' },
+        { id: 'lunch', title: 'Lunch', start: '12:45' },
+      ]),
+    );
+    expect(parsed.map((i) => i.id)).toEqual(['welcome', 'perf-01', 'perf-02', 'lunch']);
+    expect(parsed[1].start).toBeUndefined();
+    expect(parsed[2]).toMatchObject({ start: undefined, end: undefined });
+    expect(timeRange(parsed[0])).toBe('10:45–11:00');
+    expect(timeRange(parsed[1])).toBe('');
+  });
+
+  it('rejects an end time without a start time', () => {
+    expect(() => parseSchedule(items([{ id: 'x', title: 'X', end: '12:00' }]))).toThrow('has an "end" time but no "start" time');
   });
 
   it('accepts a bare list', () => {
@@ -86,6 +106,14 @@ describe('nowAndNext', () => {
   it('cancelling a later item in advance does not change what is next', () => {
     const { next } = nowAndNext([item('a', '17:00', 'live'), item('b', '18:00'), item('c', '19:00', 'cancelled'), item('d', '20:00')]);
     expect(next.map((i) => i.id)).toEqual(['b']);
+  });
+
+  it('brings up items without a time one at a time, in file order', () => {
+    const untimed = (id: string, status: ScheduleStatus = 'upcoming') => ({ ...item(id, '', status), start: undefined });
+    expect(nowAndNext([item('welcome', '10:45'), untimed('p1'), untimed('p2')]).next.map((i) => i.id)).toEqual(['welcome']);
+    expect(nowAndNext([item('welcome', '10:45', 'done'), untimed('p1'), untimed('p2')]).next.map((i) => i.id)).toEqual(['p1']);
+    expect(nowAndNext([untimed('p1', 'live'), untimed('p2'), item('lunch', '12:45')]).next.map((i) => i.id)).toEqual(['p2']);
+    expect(nowAndNext([untimed('p1', 'done'), untimed('p2', 'done'), item('lunch', '12:45')]).next.map((i) => i.id)).toEqual(['lunch']);
   });
 
   it('is empty when everything is finished', () => {

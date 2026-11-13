@@ -69,7 +69,7 @@ function ProgrammeBar({ items }: { items: ScheduledItem[] }) {
         {next.length > 0 && (
           <>
             <span className="mx-2 text-muted">·</span>
-            <span className="text-muted">Next:</span> {titles(next)} <span className="text-muted">({next[0].start})</span>
+            <span className="text-muted">Next:</span> {titles(next)} {next[0].start && <span className="text-muted">({next[0].start})</span>}
           </>
         )}
       </span>

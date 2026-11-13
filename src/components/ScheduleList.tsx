@@ -242,14 +242,20 @@ function NowCard({ item, children }: { item: ScheduledItem; children?: React.Rea
   );
 }
 
-/** A card for what's coming next, with its start time up front. */
+/** A card for what's coming next, with its start time up front (or its icon, for an item without a time). */
 function NextCard({ item, children }: { item: ScheduledItem; children?: React.ReactNode }) {
   return (
     <article className="card p-4">
       <div className="flex gap-4">
-        <div className="flex w-16 shrink-0 flex-col items-center self-start rounded-xl bg-brand-soft py-2.5 text-brand">
-          <span className="text-lg leading-none font-semibold tabular-nums">{item.start}</span>
-          {item.end && <span className="mt-1 text-[11px] font-medium opacity-80 tabular-nums">to {item.end}</span>}
+        <div className="flex min-h-12 w-16 shrink-0 flex-col items-center justify-center self-start rounded-xl bg-brand-soft py-2.5 text-brand">
+          {item.start ? (
+            <>
+              <span className="text-lg leading-none font-semibold tabular-nums">{item.start}</span>
+              {item.end && <span className="mt-1 text-[11px] font-medium opacity-80 tabular-nums">to {item.end}</span>}
+            </>
+          ) : (
+            <KindIcon kind={item.kind} className="h-6 w-6" />
+          )}
         </div>
         <div className="min-w-0 flex-1 self-center">
           <h3 className="text-[17px] leading-snug font-semibold">{item.title}</h3>
@@ -271,7 +277,14 @@ function Row({ item, onOpen }: { item: ScheduledItem; onOpen?: (item: ScheduledI
   const where = [item.place, item.end && `until ${item.end}`].filter(Boolean).join(' · ');
   const summary = (
     <>
-      <span className={`w-12 shrink-0 text-[15px] font-semibold tabular-nums ${done || cancelled ? 'text-muted' : ''}`}>{item.start}</span>
+      {item.start ? (
+        <span className={`w-12 shrink-0 text-[15px] font-semibold tabular-nums ${done || cancelled ? 'text-muted' : ''}`}>{item.start}</span>
+      ) : (
+        // No time (the performances): the item's icon keeps the titles lined up.
+        <span className="flex w-12 shrink-0 text-muted">
+          <KindIcon kind={item.kind} />
+        </span>
+      )}
       <span className="min-w-0 flex-1">
         {/* Up to two lines, so titles aren't cut off on a phone */}
         <span className={`line-clamp-2 text-[15px] leading-snug font-medium ${cancelled ? 'text-muted line-through' : done ? 'text-muted' : ''}`}>
@@ -283,7 +296,7 @@ function Row({ item, onOpen }: { item: ScheduledItem; onOpen?: (item: ScheduledI
         {item.note && !done && <span className="mt-1 block text-xs font-medium text-brand">{item.note}</span>}
       </span>
       {/* Icons only where they tell guests something: food, games, kids. Most of the day is stage items. */}
-      {!done && item.kind !== 'stage' && (
+      {!done && item.kind !== 'stage' && item.start && (
         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-2 ${cancelled ? 'text-danger' : 'text-muted'}`}>
           <KindIcon kind={item.kind} />
         </span>

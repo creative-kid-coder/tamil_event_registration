@@ -39,7 +39,8 @@ export function HomeNow() {
             )
           ) : (
             <>
-              <Bi en="Up next" ta="upNext" /> · {item.start}
+              <Bi en="Up next" ta="upNext" />
+              {item.start && ` · ${item.start}`}
             </>
           )}
         </span>

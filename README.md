@@ -183,13 +183,14 @@ Guests see the running order and what's on right now at **`/schedule`**. No sign
     "place": "Main hall", "kind": "stage", "forWho": "Everyone", "description": "…" }
 ] }
 ```
-- **Required fields:** `id`, `title` and `start` (24-hour, e.g. `18:30`).
+- **Required fields:** `id` and `title`.
+- **The running order is the order of the items in the file**, so list them in the order they happen.
 - **Optional fields:**
-  - `end`
+  - `start` and `end` (24-hour, e.g. `18:30`). Leave both out for an item without a fixed time, such as each performance: it shows its icon instead of a time and comes up in its place in the order. `end` needs a `start`.
   - `place`
   - `forWho`
   - `description`
-  - `kind`: one of `stage`, `food`, `game`, `kids` or `other`. It only sets the icon guests see next to the item (none for `stage`, as most of the day is stage items).
+  - `kind`: one of `stage`, `food`, `game`, `kids` or `other`. It only sets the icon guests see for the item. Items with a time show it on the right, except `stage` items; items without a time show it in place of the time.
 - **Keep each `id` the same once the day starts**, because statuses are saved against it.
 - **If an edit breaks the file**, the admin page shows what's wrong and guests keep seeing the last good version.
 
